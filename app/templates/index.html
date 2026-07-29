@@ -4,111 +4,128 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Sistema de Compras</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <style>
-  :root {
-    --bg: #0f0f0f;
-    --bg2: #171717;
-    --bg3: #1f1f1f;
-    --border: #2a2a2a;
-    --accent: #00e5a0;
-    --accent2: #005c41;
-    --text: #e8e8e8;
-    --text2: #888;
-    --red: #ff4d4d;
-    --yellow: #ffd166;
-    --mono: 'IBM Plex Mono', monospace;
-    --sans: 'IBM Plex Sans', sans-serif;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--bg); color: var(--text); font-family: var(--sans); display: flex; height: 100vh; overflow: hidden; }
-  #sidebar { width: 220px; min-width: 220px; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 24px 0; }
-  #sidebar .logo { padding: 0 20px 24px; border-bottom: 1px solid var(--border); font-family: var(--mono); font-size: 11px; color: var(--accent); letter-spacing: 2px; text-transform: uppercase; }
-  #sidebar .logo span { display: block; font-size: 18px; font-weight: 600; letter-spacing: 0; margin-top: 4px; color: var(--text); }
-  nav { margin-top: 16px; flex: 1; }
-  nav a { display: flex; align-items: center; gap: 10px; padding: 11px 20px; color: var(--text2); text-decoration: none; font-size: 13px; font-weight: 500; transition: all 0.15s; cursor: pointer; border-left: 3px solid transparent; }
-  nav a:hover { color: var(--text); background: var(--bg3); }
-  nav a.active { color: var(--accent); border-left-color: var(--accent); background: rgba(0,229,160,0.05); }
-  nav a .icon { font-size: 16px; width: 20px; text-align: center; }
-  #main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-  #topbar { height: 56px; background: var(--bg2); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 28px; gap: 16px; }
-  #topbar h1 { font-size: 15px; font-weight: 600; flex: 1; }
-  #content { flex: 1; overflow-y: auto; padding: 28px; }
-  .page { display: none; }
-  .page.active { display: block; }
-  .card { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin-bottom: 16px; }
-  .card-title { font-size: 12px; font-family: var(--mono); color: var(--accent); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; }
-  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; border: none; transition: all 0.15s; font-family: var(--sans); }
-  .btn-primary { background: var(--accent); color: #000; }
-  .btn-primary:hover { background: #00ffb3; }
-  .btn-secondary { background: var(--bg3); color: var(--text); border: 1px solid var(--border); }
-  .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
-  .btn-danger { background: transparent; color: var(--red); border: 1px solid var(--red); }
-  .btn-danger:hover { background: var(--red); color: #fff; }
-  .btn-sm { padding: 5px 10px; font-size: 12px; }
-  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
-  input, select { background: var(--bg3); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; border-radius: 6px; font-size: 13px; font-family: var(--sans); outline: none; transition: border 0.15s; }
-  input:focus, select:focus { border-color: var(--accent); }
-  input::placeholder { color: var(--text2); }
-  .table-wrap { overflow-x: auto; border-radius: 8px; border: 1px solid var(--border); }
-  table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  thead th { background: var(--bg3); padding: 10px 12px; text-align: left; font-family: var(--mono); font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; border-bottom: 1px solid var(--border); }
-  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
-  tbody tr:last-child { border-bottom: none; }
-  tbody tr:hover { background: var(--bg3); }
-  tbody td { padding: 9px 12px; vertical-align: middle; }
-  .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-family: var(--mono); font-weight: 600; }
-  .badge-green { background: rgba(0,229,160,0.1); color: var(--accent); }
-  .badge-red { background: rgba(255,77,77,0.1); color: var(--red); }
-  .badge-yellow { background: rgba(255,209,102,0.1); color: var(--yellow); }
-  .price-best { color: var(--accent); font-weight: 600; }
-  .price-none { color: var(--text2); font-style: italic; }
-  .row-no-link td { border-left: 3px solid var(--red); }
-  .upload-zone { border: 2px dashed var(--border); border-radius: 8px; padding: 40px; text-align: center; cursor: pointer; transition: all 0.2s; }
-  .upload-zone:hover, .upload-zone.drag { border-color: var(--accent); background: rgba(0,229,160,0.03); }
-  .upload-zone .icon { font-size: 32px; margin-bottom: 12px; }
-  .upload-zone p { color: var(--text2); font-size: 13px; }
-  .upload-zone strong { color: var(--accent); }
-  .file-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--bg3); border-radius: 6px; margin-bottom: 8px; border: 1px solid var(--border); }
-  .file-item .file-name { flex: 1; font-size: 13px; }
-  .file-item .file-status { font-size: 11px; font-family: var(--mono); }
-  .preview-table { font-size: 12px; font-family: var(--mono); }
-  .preview-table th { cursor: pointer; user-select: none; }
-  .preview-table th:hover { color: var(--accent); }
-  .preview-table th.selected-cf { background: rgba(0,229,160,0.2) !important; color: var(--accent); }
-  .preview-table th.selected-pf { background: rgba(255,209,102,0.2) !important; color: var(--yellow); }
-  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 24px; }
-  .stat { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 16px 20px; }
-  .stat .label { font-size: 11px; font-family: var(--mono); color: var(--text2); text-transform: uppercase; letter-spacing: 1px; }
-  .stat .value { font-size: 24px; font-weight: 600; margin-top: 4px; color: var(--accent); }
-  .flex { display: flex; gap: 12px; align-items: center; }
-  .flex-wrap { flex-wrap: wrap; }
-  .mt-16 { margin-top: 16px; }
-  .text-muted { color: var(--text2); font-size: 12px; }
-  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--bg3); border: 1px solid var(--accent); color: var(--text); padding: 12px 20px; border-radius: 8px; font-size: 13px; z-index: 9999; animation: slideIn 0.3s ease; display: none; }
-  @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-  .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.6s linear infinite; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .legend { display: flex; gap: 16px; margin-bottom: 12px; }
-  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text2); }
-  .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+  :root{--bg:#f4f6f9;--bg2:#fff;--bg3:#f8f9fa;--border:#dee2e6;--accent:#00a65a;--accent-dark:#008d4c;--accent-light:#e8f5e9;--text:#333;--text2:#6c757d;--red:#dd4b39;--yellow:#f39c12;--blue:#3c8dbc;--sans:'Inter',sans-serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13px;display:flex;height:100vh;overflow:hidden}
+  #sidebar{width:170px;min-width:170px;background:#222d32;display:flex;flex-direction:column}
+  #sidebar .logo{padding:16px 20px;background:#1a2226}
+  #sidebar .logo .brand{font-size:17px;font-weight:600;color:#fff}
+  #sidebar .logo .sub{font-size:11px;color:#8aa4af;margin-top:2px}
+  nav{flex:1;padding-top:8px}
+  nav a{display:flex;align-items:center;gap:10px;padding:11px 20px;color:#8aa4af;text-decoration:none;font-size:13px;transition:all .15s;cursor:pointer;border-left:3px solid transparent}
+  nav a:hover{color:#fff;background:#1e282c}
+  nav a.active{color:#fff;border-left-color:var(--accent);background:#1e282c}
+  nav a .icon{font-size:14px;width:18px;text-align:center}
+  #main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+  #topbar{height:50px;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:12px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+  #topbar h1{font-size:16px;font-weight:600;flex:1}
+  #content{flex:1;overflow:auto;padding:16px}
+  .page{display:none}.page.active{display:block}
+  .card{background:var(--bg2);border:1px solid var(--border);border-radius:4px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+  .card-header{padding:10px 16px;border-bottom:1px solid var(--border);background:var(--bg3);border-radius:4px 4px 0 0;display:flex;align-items:center;justify-content:space-between}
+  .card-header h3{font-size:13px;font-weight:600}
+  .card-body{padding:14px 16px}
+  .btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:3px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid transparent;transition:all .15s;font-family:var(--sans)}
+  .btn-primary{background:var(--accent);color:#fff;border-color:var(--accent-dark)}.btn-primary:hover{background:var(--accent-dark)}
+  .btn-secondary{background:#fff;color:var(--text);border-color:var(--border)}.btn-secondary:hover{background:var(--bg3)}
+  .btn-danger{background:var(--red);color:#fff;border-color:#c0392b}.btn-danger:hover{background:#c0392b}
+  .btn-sm{padding:4px 10px;font-size:12px}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  input[type=text],input[type=number],select,textarea{background:#fff;border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:3px;font-size:13px;font-family:var(--sans);outline:none;transition:border .15s;width:100%}
+  input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(0,166,90,.12)}
+  input::placeholder,textarea::placeholder{color:#adb5bd}
+  label.field-label{display:block;font-size:11px;font-weight:600;color:var(--text2);margin-bottom:4px;text-transform:uppercase;letter-spacing:.3px}
+  .table-wrap{border:1px solid var(--border);border-radius:4px;overflow:auto}
+  .js-fixed{position:fixed!important;z-index:100;background:var(--bg)}
+  .js-fixed-header{position:fixed!important;z-index:100;overflow:hidden;background:#f1f3f5;border-bottom:2px solid var(--border);box-shadow:0 2px 4px rgba(0,0,0,.06)}
+  .js-fixed-header table{width:100%;border-collapse:collapse}
+  .js-fixed-header th{background:#f1f3f5;padding:8px 10px;text-align:left;font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;white-space:nowrap;border-bottom:none}
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  thead th{position:sticky;top:0;z-index:2;background:#f1f3f5;padding:8px 10px;text-align:left;font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.4px;white-space:nowrap;border-bottom:2px solid var(--border);cursor:pointer;user-select:none}
+  thead th:hover{background:#e9ecef;color:var(--accent)}
+  tbody tr{border-bottom:1px solid #f0f0f0;transition:background .1s}
+  tbody tr:last-child{border-bottom:none}
+  tbody tr:hover{background:#f0faf5}
+  tbody td{padding:7px 10px;vertical-align:middle}
+  .badge{display:inline-block;padding:2px 7px;border-radius:3px;font-size:11px;font-weight:600}
+  .badge-green{background:#d4edda;color:#155724}
+  .badge-red{background:#f8d7da;color:#721c24}
+  .badge-yellow{background:#fff3cd;color:#856404}
+  .badge-blue{background:#d1ecf1;color:#0c5460}
+  .badge-orange{background:#ffe5d0;color:#7d3c00}
+  .price-best{color:var(--accent);font-weight:700}
+  .price-none{color:#ccc}
+  .row-no-link{background:#fff8f8!important}
+  .row-no-link td:first-child{border-left:3px solid #ffcdd2}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
+  .stat{background:var(--bg2);border:1px solid var(--border);border-radius:4px;padding:12px 16px}
+  .stat .label{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px}
+  .stat .value{font-size:24px;font-weight:700;margin-top:4px;color:var(--accent)}
+  .form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:12px}
+  .filtro-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+  .filtro-box{border:1px solid var(--border);border-radius:4px;overflow:hidden}
+  .filtro-box-header{padding:7px 12px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+  .filtro-box-header.incluir{background:#d4edda;color:#155724;border-bottom:1px solid #c3e6cb}
+  .filtro-box-header.excluir{background:#f8d7da;color:#721c24;border-bottom:1px solid #f5c6cb}
+  .filtro-box textarea{border:none;border-radius:0;resize:vertical;min-height:55px;font-size:13px;padding:8px 12px}
+  .filtro-box textarea:focus{box-shadow:none}
+  .filtro-hint{padding:4px 12px 6px;font-size:11px;color:var(--text2);background:var(--bg3);border-top:1px solid var(--border)}
+  .flex{display:flex;gap:10px;align-items:center}
+  .flex-wrap{flex-wrap:wrap}
+  .mt-10{margin-top:10px}.mt-12{margin-top:12px}
+  .text-muted{color:var(--text2);font-size:12px}
+  .toast{position:fixed;bottom:20px;right:20px;background:#333;color:#fff;padding:10px 18px;border-radius:4px;font-size:13px;z-index:9999;display:none;box-shadow:0 4px 12px rgba(0,0,0,.2)}
+  .spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .upload-zone{border:2px dashed var(--border);border-radius:4px;padding:28px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg3)}
+  .upload-zone:hover,.upload-zone.drag{border-color:var(--accent);background:var(--accent-light)}
+  .upload-zone .icon{font-size:26px;margin-bottom:6px}
+  .upload-zone p{color:var(--text2);font-size:13px}
+  .upload-zone strong{color:var(--accent)}
+  .file-item{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--bg3);border-radius:4px;margin-bottom:6px;border:1px solid var(--border)}
+  .file-item .file-name{flex:1;font-size:13px}
+  .preview-table th{cursor:pointer}
+  .preview-table th:hover{background:#e8f5e9!important;color:var(--accent)}
+  .preview-table th.selected-cf,.preview-table td.selected-cf{background:#d4edda!important;color:#155724!important}
+  .preview-table th.selected-pf,.preview-table td.selected-pf{background:#fff3cd!important;color:#856404!important}
+  .legend{display:flex;gap:14px;margin-bottom:8px}
+  .legend-item{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text2)}
+  .legend-dot{width:9px;height:9px;border-radius:50%}
+  .price-editable{cursor:pointer;border-bottom:1px dashed #ccc}
+  .price-editable:hover{color:var(--accent);border-bottom-color:var(--accent)}
+  .price-input-edit{width:80px;padding:2px 6px;font-size:12px}
+  .modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.4);z-index:1000;display:none;align-items:center;justify-content:center}
+  .modal-overlay.open{display:flex}
+  .modal{background:#fff;border-radius:6px;width:620px;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 8px 32px rgba(0,0,0,.2)}
+  .modal-lg{width:820px}
+  .modal-header{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+  .modal-header h3{font-size:14px;font-weight:600}
+  .modal-body{padding:14px 16px;flex:1;overflow-y:auto}
+  .modal-close{cursor:pointer;font-size:18px;color:var(--text2);background:none;border:none;line-height:1}
+  /* Empresa badge */
+  .emp-badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700;margin-left:8px}
+  .emp-1{background:#d4edda;color:#155724}
+  .emp-3{background:#d1ecf1;color:#0c5460}
 </style>
 </head>
 <body>
 <div id="sidebar">
-  <div class="logo">Moto Supri<span>Compras</span></div>
+  <div class="logo"><div class="brand">🛒 Compras</div><div class="sub">Moto Supri</div></div>
   <nav>
-    <a class="active" onclick="navTo('pedido', this)"><span class="icon">🛒</span> Pedido</a>
-    <a onclick="navTo('importar', this)"><span class="icon">📥</span> Importar Preços</a>
-    <a onclick="navTo('vinculos', this)"><span class="icon">🔗</span> Vínculos</a>
-    <a onclick="navTo('carga', this)"><span class="icon">⚙️</span> Carga Inicial</a>
+    <a class="active" onclick="navTo('pedido',this)"><span class="icon">📋</span> Pedido</a>
+    <a onclick="navTo('importar',this)"><span class="icon">📥</span> Importar Preços</a>
+    <a onclick="navTo('vinculos',this)"><span class="icon">🔗</span> Vínculos</a>
+    <a onclick="navTo('registros',this)"><span class="icon">📁</span> Reg. Pedidos</a>
+    <a onclick="navTo('carga',this)"><span class="icon">⚙️</span> Carga Inicial</a>
   </nav>
 </div>
 <div id="main">
-  <div id="topbar">
-    <h1 id="page-title">Pedido de Compras</h1>
-  </div>
+  <div id="topbar"><h1 id="page-title">Pedido de Compras</h1></div>
   <div id="content">
+
+    <!-- PEDIDO -->
     <div id="page-pedido" class="page active">
       <div class="stats">
         <div class="stat"><div class="label">Itens</div><div class="value" id="stat-itens">—</div></div>
@@ -117,107 +134,317 @@
         <div class="stat"><div class="label">Total Estimado</div><div class="value" id="stat-total" style="font-size:18px">—</div></div>
       </div>
       <div class="card">
-        <div class="card-title">Carregar Lista de Compras</div>
-        <div class="flex flex-wrap">
-          <button class="btn btn-primary" onclick="carregarSankhya()">⚡ Buscar do Sankhya</button>
-          <span class="text-muted">ou</span>
-          <label class="btn btn-secondary" style="cursor:pointer">
-            📂 Upload Excel <input type="file" accept=".xlsx" id="upload-pedido" style="display:none" onchange="carregarUpload(this)"/>
-          </label>
+        <div class="card-header"><h3>⚙️ Configuração do Pedido</h3><button class="btn btn-secondary btn-sm" id="btn-toggle-config" onclick="toggleConfigCard()">▲ Recolher</button></div>
+        <div class="card-body" id="config-card-body">
+          <div class="form-grid">
+            <div>
+              <label class="field-label">Empresa</label>
+              <select id="cfg-codemp" onchange="onEmpresaChange()">
+                <option value="1">1 — Matriz</option>
+                <option value="3">3 — Filial</option>
+                <option value="4">4 — Filial</option>
+              </select>
+            </div>
+            <div><label class="field-label">Local (Depósito)</label><input type="number" id="cfg-codlocal" value="10000000"/></div>
+            <div><label class="field-label">Dias Úteis / Mês</label><input type="number" id="cfg-dias-uteis-mes" value="22" min="1"/></div>
+            <div><label class="field-label">Cobertura (dias)</label><input type="number" id="cfg-cobertura-dias" value="30" min="1"/></div>
+          </div>
+          <div class="form-grid">
+            <div><label class="field-label">Margem de Segurança</label><input type="number" id="cfg-margem" value="1.2" step="0.1" min="1"/></div>
+            <div><label class="field-label">Qtd. Sem Histórico</label><input type="number" id="cfg-qtd-sem-historico" value="3" min="0"/></div>
+            <div><label class="field-label">Tipos Venda (CODTIPOPER)</label><input type="text" id="cfg-tipos-venda" value="1100" placeholder="Ex: 1100 ou 1120"/></div>
+            <div><label class="field-label">Tipos Compra (CODTIPOPER)</label><input type="text" id="cfg-tipos-compra" value="109,110,205,215"/></div>
+          </div>
+
+          <!-- Filtros (valem pra qualquer empresa) -->
+          <div class="filtro-grid">
+            <div class="filtro-box">
+              <div class="filtro-box-header incluir">✅ Buscar (Apoio Compras)</div>
+              <textarea id="txt-incluir-apoio" placeholder="Ex: Importados, Plastico"></textarea>
+              <div class="filtro-hint">Vazio = todos. Separe por vírgula para múltiplos valores</div>
+            </div>
+            <div class="filtro-box">
+              <div class="filtro-box-header excluir">🚫 Não Buscar (Apoio Compras)</div>
+              <textarea id="txt-excluir-apoio" placeholder="Ex: Exclusivo, Miudezas"></textarea>
+              <div class="filtro-hint">Separe por vírgula para múltiplos valores</div>
+            </div>
+          </div>
+          <div class="filtro-grid" style="margin-top:8px">
+            <div class="filtro-box">
+              <div class="filtro-box-header incluir">✅ Buscar (Marca)</div>
+              <textarea id="txt-incluir-marca" placeholder="Vazio = todas as marcas"></textarea>
+              <div class="filtro-hint">Vazio = todas. Separe por vírgula.</div>
+            </div>
+            <div class="filtro-box">
+              <div class="filtro-box-header excluir">🚫 Não Buscar (Marca)</div>
+              <textarea id="txt-excluir-marca" placeholder="Ex: Honda"></textarea>
+              <div class="filtro-hint">Separe por vírgula para múltiplos valores</div>
+            </div>
+          </div>
+
+          <div class="flex mt-12">
+            <button class="btn btn-primary" onclick="carregarSankhya()">⚡ Buscar do Sankhya</button>
+            <button class="btn btn-secondary" onclick="limparPedido()">🗑️ Limpar</button>
+          </div>
         </div>
       </div>
-      <div id="pedido-container" style="display:none">
-        <div class="legend">
-          <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div> Menor preço</div>
-          <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div> Sem vínculo</div>
+
+      <!-- Filtro tabela pedido -->
+      <div id="filtro-pedido-row" class="card" style="display:none;margin-bottom:8px">
+        <div class="card-body" style="padding:10px 16px">
+          <div class="flex flex-wrap" style="gap:8px">
+            <input type="text" id="filtro-pedido-texto" placeholder="🔍 Filtrar por código ou descrição..." style="flex:1;min-width:200px" oninput="filtrarTabelaPedido()"/>
+            <select id="filtro-pedido-fornecedor" style="width:140px" onchange="filtrarTabelaPedido()">
+              <option value="">Todos fornecedores</option>
+            </select>
+            <button class="btn btn-secondary btn-sm" onclick="limparFiltroPedido()">✕ Limpar filtro</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabela Empresa 1 -->
+      <div id="pedido-container-emp1" style="display:none">
+        <div class="flex" id="legend-row-emp1" style="margin-bottom:8px;justify-content:space-between;background:var(--bg);padding:6px 0">
+          <div class="legend">
+            <div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div> Menor preço</div>
+            <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div> Sem vínculo</div>
+            <div class="legend-item"><span class="text-muted">Clique no preço para editar</span></div>
+          </div>
+          <div class="flex">
+            <button class="btn btn-secondary btn-sm" onclick="exportarSemVinculo()">📋 Sem Vínculo</button>
+            <button class="btn btn-primary" onclick="abrirModalEmitirPedido()">📄 Emitir Pedido</button>
+          </div>
         </div>
         <div class="table-wrap">
-          <table id="table-pedido">
-            <thead><tr>
-              <th>Código</th><th>Descrição</th><th>Custo</th><th>Qtd.</th>
+          <table id="table-emp1">
+            <thead id="thead-emp1"><tr>
+              <th onclick="sortPedido('codprod')">Código</th>
+              <th onclick="sortPedido('descrprod')">Descrição</th>
+              <th onclick="sortPedido('marca')">Marca</th>
+              <th onclick="sortPedido('referencia')">Ref.</th>
+              <th onclick="sortPedido('custo_gerencial')">Custo Ger.</th>
+              <th onclick="sortPedido('estoque_disponivel')">Estoque</th>
+              <th onclick="sortPedido('giro_diario')">Giro/Dia</th>
+              <th onclick="sortPedido('sugestao_compra_giro')">Sug.</th>
+              <th onclick="sortPedido('sugestao_compra_ajustada')">Sug.Aj.</th>
               <th>Embus</th><th>Tmac</th><th>Solidez</th><th>Atacado</th><th>Catimoto</th><th>Atec</th>
               <th>Fornecedor</th><th>Preço</th><th>Subtotal</th><th>Cód. Forn.</th>
             </tr></thead>
-            <tbody id="tbody-pedido"></tbody>
+            <tbody id="tbody-pedido-emp1"></tbody>
           </table>
         </div>
-        <div class="flex mt-16">
-          <button class="btn btn-primary" onclick="exportarPedido()">📊 Exportar Excel</button>
+        <div class="flex mt-10">
+          <button class="btn btn-secondary" onclick="exportarPedido()">📊 Exportar Excel</button>
         </div>
       </div>
-    </div>
 
-    <div id="page-importar" class="page">
-      <div class="card">
-        <div class="card-title">Atualização Mensal de Preços</div>
-        <div id="import-step-upload">
-          <div class="upload-zone" id="drop-zone" onclick="document.getElementById('upload-fornecedores').click()"
-               ondragover="event.preventDefault();this.classList.add('drag')"
-               ondragleave="this.classList.remove('drag')"
-               ondrop="handleDrop(event)">
-            <input type="file" id="upload-fornecedores" accept=".xlsx" multiple style="display:none" onchange="handleFiles(this.files)"/>
-            <div class="icon">📦</div>
-            <p>Arraste os Excel dos fornecedores aqui ou <strong>clique para selecionar</strong></p>
-            <p style="margin-top:8px;font-size:11px">Você pode selecionar vários de uma vez</p>
+      <!-- Filtro tabela pedido empresa 3/4 -->
+      <div id="filtro-pedido-row-outras" class="card" style="display:none;margin-bottom:8px">
+        <div class="card-body" style="padding:10px 16px">
+          <div class="flex flex-wrap" style="gap:8px">
+            <input type="text" id="filtro-pedido-texto-outras" placeholder="🔍 Filtrar por código, descrição ou marca..." style="flex:1;min-width:200px" oninput="filtrarTabelaPedidoOutras()"/>
+            <button class="btn btn-secondary btn-sm" onclick="limparFiltroPedidoOutras()">✕ Limpar filtro</button>
           </div>
-          <div id="files-list" class="mt-16"></div>
-          <button class="btn btn-primary mt-16" id="btn-iniciar-config" style="display:none" onclick="iniciarConfig()">Configurar arquivos →</button>
-        </div>
-        <div id="import-step-config" style="display:none"><div id="config-wizard"></div></div>
-        <div id="import-step-resultado" style="display:none">
-          <div id="resultado-import"></div>
-          <button class="btn btn-secondary mt-16" onclick="resetImport()">← Nova importação</button>
         </div>
       </div>
-      <div class="card">
-        <div class="card-title">Status dos Preços no Banco</div>
-        <div id="resumo-precos"></div>
-      </div>
-    </div>
 
-    <div id="page-vinculos" class="page">
-      <div class="card">
-        <div class="card-title">Adicionar Vínculo</div>
-        <div class="flex flex-wrap">
-          <input id="vinc-codigo" placeholder="Meu código" style="width:120px" oninput="autocompleteProduct(this)"/>
-          <div style="position:relative">
-            <input id="vinc-descricao" placeholder="Descrição" style="width:280px" readonly/>
-            <div id="autocomplete-list" style="position:absolute;top:100%;left:0;background:var(--bg3);border:1px solid var(--border);border-radius:6px;z-index:100;width:100%;display:none"></div>
+      <!-- Tabela Empresa 3 / 4 (transferência interna da matriz) -->
+      <div id="pedido-container-outras" style="display:none">
+        <div class="flex" id="legend-row-outras" style="margin-bottom:8px;justify-content:space-between;background:var(--bg);padding:6px 0">
+          <div class="legend">
+            <span class="badge badge-blue" id="badge-empresa-outras">Filial</span>
+            <div class="legend-item"><span class="text-muted">Est. Filial = estoque disponível no local da filial | Est. Matriz = estoque disponível na Empresa 1</span></div>
           </div>
-          <select id="vinc-fornecedor" style="width:140px"><option value="">Fornecedor...</option></select>
-          <input id="vinc-cod-forn" placeholder="Código do fornecedor" style="width:180px"/>
-          <button class="btn btn-primary" onclick="adicionarVinculo()">+ Adicionar</button>
-        </div>
-      </div>
-      <div class="card">
-        <div class="flex flex-wrap" style="margin-bottom:16px;gap:10px">
-          <input id="busca-vinculo" placeholder="🔍 Buscar por código ou descrição..." style="flex:1;min-width:200px" oninput="filtrarVinculos()"/>
-          <select id="filtro-fornecedor" style="width:150px" onchange="filtrarVinculos()">
-            <option value="">Todos fornecedores</option>
-          </select>
+          <div class="flex">
+            <button class="btn btn-secondary btn-sm" onclick="exportarPedidoOutras()">📊 Exportar Excel</button>
+            <button class="btn btn-primary btn-sm" onclick="gerarXmlOutras()">🗂️ Gerar XML</button>
+          </div>
         </div>
         <div class="table-wrap">
-          <table>
-            <thead><tr><th>Meu Código</th><th>Descrição</th><th>Fornecedor</th><th>Cód. Fornecedor</th><th></th></tr></thead>
-            <tbody id="tbody-vinculos"></tbody>
+          <table id="table-outras">
+            <thead id="thead-outras"><tr>
+              <th onclick="sortPedido('codprod')">Código</th>
+              <th onclick="sortPedido('descrprod')">Descrição</th>
+              <th onclick="sortPedido('marca')">Marca</th>
+              <th onclick="sortPedido('custo_gerencial')">Custo Ger.</th>
+              <th onclick="sortPedido('estoque_disponivel')">Est. Filial</th>
+              <th onclick="sortPedido('estoque_disponivel_empresa1')">Est. Matriz</th>
+              <th onclick="sortPedido('giro_diario')">Giro/Dia</th>
+              <th onclick="sortPedido('sugestao_compra_giro')">Sug.</th>
+              <th onclick="sortPedido('sugestao_compra_ajustada')">Sug.Aj.</th>
+              <th onclick="sortPedido('qtd_ultima_compra')">Últ. Compra</th>
+              <th></th>
+            </tr></thead>
+            <tbody id="tbody-pedido-outras"></tbody>
           </table>
         </div>
-        <div id="vinculos-count" class="text-muted mt-16"></div>
       </div>
     </div>
 
+    <!-- IMPORTAR PREÇOS -->
+    <div id="page-importar" class="page">
+      <div class="card">
+        <div class="card-header"><h3>📥 Atualização Mensal de Preços</h3></div>
+        <div class="card-body">
+          <div id="import-step-upload">
+            <div class="upload-zone" id="drop-zone" onclick="document.getElementById('upload-fornecedores').click()"
+                 ondragover="event.preventDefault();this.classList.add('drag')"
+                 ondragleave="this.classList.remove('drag')" ondrop="handleDrop(event)">
+              <input type="file" id="upload-fornecedores" accept=".xlsx" multiple style="display:none" onchange="handleFiles(this.files)"/>
+              <div class="icon">📦</div>
+              <p>Arraste os Excel dos fornecedores aqui ou <strong>clique para selecionar</strong></p>
+              <p style="margin-top:4px;font-size:11px;color:#adb5bd">Pode selecionar vários de uma vez</p>
+            </div>
+            <div id="files-list" class="mt-10"></div>
+            <button class="btn btn-primary mt-10" id="btn-iniciar-config" style="display:none" onclick="iniciarConfig()">Configurar arquivos →</button>
+          </div>
+          <div id="import-step-config" style="display:none"><div id="config-wizard"></div></div>
+          <div id="import-step-resultado" style="display:none">
+            <div id="resultado-import"></div>
+            <button class="btn btn-secondary mt-10" onclick="resetImport()">← Nova importação</button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h3>📊 Status dos Preços no Banco</h3>
+          <button class="btn btn-danger btn-sm" onclick="limparTodosPrecos()">🗑️ Limpar todos</button>
+        </div>
+        <div class="card-body"><div id="resumo-precos"></div></div>
+      </div>
+    </div>
+
+    <!-- VÍNCULOS -->
+    <div id="page-vinculos" class="page">
+      <div class="card">
+        <div class="card-header">
+          <h3>➕ Adicionar / Importar Vínculos</h3>
+          <div class="flex">
+            <button class="btn btn-secondary btn-sm" onclick="baixarModeloVinculos()">📥 Baixar Modelo Excel</button>
+            <label class="btn btn-primary btn-sm" style="cursor:pointer">
+              📤 Importar Excel
+              <input type="file" accept=".xlsx" id="upload-vinculos-excel" style="display:none" onchange="importarVinculosExcel(this)"/>
+            </label>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="flex flex-wrap">
+            <div style="position:relative;flex:0 0 120px">
+              <input type="text" id="vinc-codigo" placeholder="Meu código" oninput="autocompleteProduct(this)"/>
+              <div id="autocomplete-list" style="position:absolute;top:100%;left:0;background:#fff;border:1px solid var(--border);border-radius:4px;z-index:100;width:320px;display:none;box-shadow:0 4px 12px rgba(0,0,0,.1)"></div>
+            </div>
+            <div style="flex:1;min-width:180px"><input type="text" id="vinc-descricao" placeholder="Descrição" readonly style="background:var(--bg3)"/></div>
+            <div style="flex:0 0 140px"><select id="vinc-fornecedor"><option value="">Fornecedor...</option></select></div>
+            <div style="flex:0 0 160px"><input type="text" id="vinc-cod-forn" placeholder="Cód. fornecedor"/></div>
+            <button class="btn btn-primary" onclick="adicionarVinculo()">+ Adicionar</button>
+          </div>
+          <div id="resultado-import-vinculos" class="mt-10"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h3>🔗 Vínculos Cadastrados</h3>
+          <div class="flex">
+            <select id="modal-fornecedor-sel" style="width:150px;font-size:12px" onchange="abrirModalPrecos(this.value)"><option value="">Ver preços de...</option></select>
+            <button class="btn btn-secondary btn-sm" onclick="exportarVinculos()">📊 Exportar Excel</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="flex flex-wrap" style="margin-bottom:10px;gap:8px">
+            <div style="flex:1;min-width:180px"><input type="text" id="busca-vinculo" placeholder="🔍 Buscar..." oninput="filtrarVinculos()"/></div>
+            <div style="flex:0 0 150px"><select id="filtro-fornecedor" onchange="filtrarVinculos()"><option value="">Todos fornecedores</option></select></div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Meu Código</th><th>Descrição</th><th>Fornecedor</th><th>Cód. Fornecedor</th><th>Preço Atual</th><th></th></tr></thead>
+              <tbody id="tbody-vinculos"></tbody>
+            </table>
+          </div>
+          <div id="vinculos-count" class="text-muted mt-10"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REGISTRO DE PEDIDOS -->
+    <div id="page-registros" class="page">
+      <div class="card">
+        <div class="card-header"><h3>📁 Registro de Pedidos</h3></div>
+        <div class="card-body">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Número</th><th>Fornecedor</th><th>Data</th><th>Total</th><th></th></tr></thead>
+              <tbody id="tbody-registros"></tbody>
+            </table>
+          </div>
+          <div id="registros-empty" class="text-muted mt-10" style="display:none">Nenhum pedido emitido ainda.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARGA INICIAL -->
     <div id="page-carga" class="page">
       <div class="card">
-        <div class="card-title">Importar Vínculos Iniciais (CSV)</div>
-        <p class="text-muted" style="margin-bottom:16px">
-          Use esta tela uma única vez para carregar sua planilha de vínculos existente.<br/>
-          O CSV deve ter as colunas: <code style="color:var(--accent)">meu_codigo, descricao, fornecedor, codigo_fornecedor</code>
-        </p>
-        <label class="btn btn-secondary" style="cursor:pointer">
-          📂 Selecionar CSV
-          <input type="file" accept=".csv" id="upload-csv" style="display:none" onchange="importarCSV(this)"/>
-        </label>
-        <div id="resultado-csv" class="mt-16"></div>
+        <div class="card-header"><h3>⚙️ Importar Vínculos Iniciais (CSV)</h3></div>
+        <div class="card-body">
+          <p class="text-muted" style="margin-bottom:10px">Colunas: <code style="color:var(--accent);background:var(--accent-light);padding:1px 6px;border-radius:3px">meu_codigo, descricao, fornecedor, codigo_fornecedor</code></p>
+          <label class="btn btn-secondary" style="cursor:pointer">📂 Selecionar CSV
+            <input type="file" accept=".csv" id="upload-csv" style="display:none" onchange="importarCSV(this)"/>
+          </label>
+          <div id="resultado-csv" class="mt-10"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PREÇOS -->
+<div class="modal-overlay" id="modal-precos">
+  <div class="modal">
+    <div class="modal-header"><h3 id="modal-title">Preços</h3><button class="modal-close" onclick="fecharModal('modal-precos')">✕</button></div>
+    <div class="modal-body">
+      <div style="margin-bottom:10px"><input type="text" id="modal-busca" placeholder="🔍 Buscar por código..." oninput="filtrarModalPrecos(this.value)"/></div>
+      <div class="table-wrap"><table><thead><tr><th>Código Fornecedor</th><th>Preço</th></tr></thead><tbody id="tbody-modal-precos"></tbody></table></div>
+      <div id="modal-count" class="text-muted mt-10"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EMITIR PEDIDO (Empresa 1) -->
+<div class="modal-overlay" id="modal-emitir">
+  <div class="modal">
+    <div class="modal-header"><h3>📄 Emitir Pedido</h3><button class="modal-close" onclick="fecharModal('modal-emitir')">✕</button></div>
+    <div class="modal-body">
+      <div style="margin-bottom:12px">
+        <label class="field-label">Selecione o Fornecedor</label>
+        <select id="emitir-fornecedor" style="width:100%" onchange="previsualizarPedido()">
+          <option value="">Escolha um fornecedor...</option>
+        </select>
+      </div>
+      <div id="preview-pedido"></div>
+      <div class="flex mt-10" id="btns-emitir" style="display:none">
+        <button class="btn btn-primary" onclick="confirmarEmissao()">✅ Confirmar e Emitir</button>
+        <button class="btn btn-secondary" onclick="fecharModal('modal-emitir')">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DETALHE PEDIDO -->
+<div class="modal-overlay" id="modal-detalhe-pedido">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h3 id="modal-detalhe-title">Pedido</h3>
+      <div class="flex">
+        <button class="btn btn-secondary btn-sm" id="btn-dl-excel">📊 Excel</button>
+        <button class="btn btn-primary btn-sm" id="btn-dl-pdf">📄 PDF</button>
+        <button class="btn btn-secondary btn-sm" id="btn-dl-xml">🗂️ XML</button>
+        <button class="modal-close" onclick="fecharModal('modal-detalhe-pedido')">✕</button>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="table-wrap">
+        <table><thead><tr><th>Cód. Fornecedor</th><th>Descrição</th><th>Preço</th><th>Qtd.</th><th>Subtotal</th></tr></thead>
+        <tbody id="tbody-detalhe-pedido"></tbody></table>
       </div>
     </div>
   </div>
@@ -226,377 +453,662 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const FORNECEDORES = ['Embus','Tmac','Solidez','Atacado','Catimoto','Atec'];
-let pedidoData = [];
-let filesToConfig = [];
-let currentFileIdx = 0;
-let configuredFiles = [];
+const FORNECEDORES=['Embus','Tmac','Solidez','Atacado','Catimoto','Atec'];
+let pedidoData=[];
+let pedidoFiltrado=null;
+let pedidoEmpresa=1;
+let filesToConfig=[];
+let configuredFiles=[];
+let precosCache={};
+let modalPrecosData=[];
+let vinculosData=[];
+let pedidoSortCol=null;
+let pedidoSortDir=1;
 
-function navTo(page, el) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
-  document.getElementById('page-' + page).classList.add('active');
-  el.classList.add('active');
-  const titles = { pedido: 'Pedido de Compras', importar: 'Importar Preços', vinculos: 'Vínculos', carga: 'Carga Inicial' };
-  document.getElementById('page-title').textContent = titles[page];
-  if (page === 'vinculos') carregarVinculos();
-  if (page === 'importar') carregarResumoPrecos();
-}
-
-function toast(msg, dur = 3000) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.style.display = 'block';
-  setTimeout(() => t.style.display = 'none', dur);
-}
-
-async function carregarSankhya() {
-  toast('🔄 Buscando do Sankhya...');
-  try {
-    const r = await fetch('/api/pedido/sankhya');
-    if (!r.ok) throw new Error(await r.text());
-    pedidoData = await r.json();
-    renderPedido();
-  } catch(e) { toast('❌ Erro: ' + e.message, 5000); }
-}
-
-async function carregarUpload(input) {
-  const fd = new FormData();
-  fd.append('file', input.files[0]);
-  toast('🔄 Processando...');
-  try {
-    const r = await fetch('/api/pedido/upload', { method: 'POST', body: fd });
-    pedidoData = await r.json();
-    renderPedido();
-  } catch(e) { toast('❌ Erro: ' + e.message, 5000); }
-}
-
-function renderPedido() {
-  const tbody = document.getElementById('tbody-pedido');
-  tbody.innerHTML = '';
-  let semVinculo = 0, comPreco = 0, total = 0;
-  pedidoData.forEach((item, idx) => {
-    if (!item.tem_vinculo) semVinculo++;
-    const fornSug = item.fornecedor_sugerido || '';
-    if (fornSug) comPreco++;
-    const tr = document.createElement('tr');
-    if (!item.tem_vinculo) tr.classList.add('row-no-link');
-    let precosCells = FORNECEDORES.map(f => {
-      const info = item.precos?.[f];
-      if (!info || !info.preco) return `<td class="price-none">—</td>`;
-      const isBest = f === item.fornecedor_sugerido;
-      return `<td class="${isBest ? 'price-best' : ''}">R$ ${Number(info.preco).toFixed(2)}</td>`;
-    }).join('');
-    const opts = FORNECEDORES.filter(f => item.precos?.[f]?.preco)
-      .map(f => `<option value="${f}" ${f === fornSug ? 'selected' : ''}>${f}</option>`).join('');
-    const select = opts
-      ? `<select class="forn-select" data-idx="${idx}" onchange="onFornChange(this)" style="width:100px;padding:4px 6px">${opts}</select>`
-      : `<span class="badge badge-red">Sem vínculo</span>`;
-    const preco = item.preco_sugerido || 0;
-    const qtd = Number(item.sugestao_compra) || 0;
-    const sub = (preco * qtd).toFixed(2);
-    if (preco) total += preco * qtd;
-    tr.innerHTML = `
-      <td><span class="badge badge-green">${item.codigo}</span></td>
-      <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${item.descricao}">${item.descricao}</td>
-      <td>R$ ${Number(item.custo || 0).toFixed(2)}</td>
-      <td>${qtd}</td>
-      ${precosCells}
-      <td>${select}</td>
-      <td class="preco-cell" data-idx="${idx}">R$ ${preco ? preco.toFixed(2) : '—'}</td>
-      <td class="sub-cell" data-idx="${idx}">${preco ? 'R$ ' + sub : '—'}</td>
-      <td class="codforn-cell" data-idx="${idx}" style="font-family:var(--mono);font-size:12px">${item.cod_forn_sugerido || '—'}</td>`;
-    tbody.appendChild(tr);
+// Calcula a altura da tabela pra que, ao rolar até o fim, a barra de pesquisa fique exatamente no topo
+function ajustarAlturaTabela(){
+  const topbarH=document.getElementById('topbar').offsetHeight;
+  [['pedido-container-emp1','filtro-pedido-row'],['pedido-container-outras','filtro-pedido-row-outras']].forEach(([containerId,searchId])=>{
+    const container=document.getElementById(containerId);
+    if(getComputedStyle(container).display==='none')return;
+    const searchBar=document.getElementById(searchId);
+    const legend=container.querySelector('.flex[id^="legend-row"]')||container.querySelector('.flex');
+    const tableWrap=container.querySelector('.table-wrap');
+    const belowRow=container.querySelector('.mt-10'); // linha do botão "Exportar Excel" (se existir)
+    if(!searchBar||!legend||!tableWrap)return;
+    const sbH=searchBar.getBoundingClientRect().height;
+    const lgH=legend.getBoundingClientRect().height;
+    const belowH=belowRow?belowRow.getBoundingClientRect().height+10:0;
+    const pad=32; // padding do #content (16px topo + 16px base)
+    const maxH=window.innerHeight-topbarH-sbH-lgH-belowH-pad;
+    tableWrap.style.maxHeight=Math.max(200,maxH)+'px';
   });
-  document.getElementById('pedido-container').style.display = 'block';
-  document.getElementById('stat-itens').textContent = pedidoData.length;
-  document.getElementById('stat-com-preco').textContent = comPreco;
-  document.getElementById('stat-sem-vinculo').textContent = semVinculo;
-  document.getElementById('stat-total').textContent = 'R$ ' + total.toLocaleString('pt-BR', {minimumFractionDigits:2});
 }
+window.addEventListener('resize',ajustarAlturaTabela);
 
-function onFornChange(sel) {
-  const idx = parseInt(sel.dataset.idx);
-  const item = pedidoData[idx];
-  const forn = sel.value;
-  const info = item.precos?.[forn];
-  const preco = info?.preco || 0;
-  const qtd = Number(item.sugestao_compra) || 0;
-  item.fornecedor_selecionado = forn;
-  item.preco_selecionado = preco;
-  item.cod_forn_selecionado = info?.codigo_fornecedor;
-  item.subtotal = preco * qtd;
-  document.querySelector(`.preco-cell[data-idx="${idx}"]`).textContent = preco ? `R$ ${preco.toFixed(2)}` : '—';
-  document.querySelector(`.sub-cell[data-idx="${idx}"]`).textContent = preco ? `R$ ${(preco * qtd).toFixed(2)}` : '—';
-  document.querySelector(`.codforn-cell[data-idx="${idx}"]`).textContent = info?.codigo_fornecedor || '—';
-  let total = 0;
-  pedidoData.forEach(p => { if (p.preco_selecionado) total += p.preco_selecionado * (Number(p.sugestao_compra) || 0); });
-  document.getElementById('stat-total').textContent = 'R$ ' + total.toLocaleString('pt-BR', {minimumFractionDigits:2});
-}
 
-async function exportarPedido() {
-  const itens = pedidoData.map(p => ({
-    codigo: p.codigo, descricao: p.descricao,
-    fornecedor_selecionado: p.fornecedor_selecionado || p.fornecedor_sugerido,
-    cod_forn_selecionado: p.cod_forn_selecionado || p.cod_forn_sugerido,
-    preco_selecionado: p.preco_selecionado || p.preco_sugerido,
-    sugestao_compra: p.sugestao_compra,
-    subtotal: (p.preco_selecionado || p.preco_sugerido || 0) * (Number(p.sugestao_compra) || 0)
-  }));
-  const r = await fetch('/api/pedido/exportar', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({itens}) });
-  const blob = await r.blob();
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href = url; a.download = 'pedido.xlsx'; a.click();
-}
-
-function handleDrop(e) {
-  e.preventDefault();
-  document.getElementById('drop-zone').classList.remove('drag');
-  handleFiles(e.dataTransfer.files);
-}
-
-function handleFiles(files) {
-  filesToConfig = Array.from(files);
-  const list = document.getElementById('files-list');
-  list.innerHTML = filesToConfig.map((f, i) => `
-    <div class="file-item">
-      <span>📄</span>
-      <span class="file-name">${f.name}</span>
-      <span class="file-status badge badge-yellow" id="fstatus-${i}">aguardando</span>
-    </div>`).join('');
-  document.getElementById('btn-iniciar-config').style.display = filesToConfig.length ? 'inline-flex' : 'none';
-}
-
-async function iniciarConfig() {
-  currentFileIdx = 0; configuredFiles = [];
-  document.getElementById('import-step-upload').style.display = 'none';
-  document.getElementById('import-step-config').style.display = 'block';
-  await carregarConfigArquivo(0);
-}
-
-async function carregarConfigArquivo(idx) {
-  const file = filesToConfig[idx];
-  const fd = new FormData(); fd.append('file', file);
-  const r = await fetch('/api/precos/preview', { method:'POST', body: fd });
-  const data = await r.json();
-  const wizard = document.getElementById('config-wizard');
-  const dataStr = JSON.stringify(data).replace(/\\/g,'\\\\').replace(/"/g,'&quot;');
-  wizard.innerHTML = `
-    <div style="margin-bottom:16px;color:var(--text2);font-size:13px">
-      Arquivo ${idx + 1} de ${filesToConfig.length}: <strong style="color:var(--text)">${file.name}</strong>
-    </div>
-    <div class="flex flex-wrap" style="margin-bottom:16px;gap:12px">
-      <div>
-        <label class="text-muted" style="display:block;margin-bottom:6px">Fornecedor</label>
-        <select id="cfg-fornecedor" style="width:160px">${FORNECEDORES.map(f => `<option>${f}</option>`).join('')}</select>
-      </div>
-      <div>
-        <label class="text-muted" style="display:block;margin-bottom:6px">Aba do Excel</label>
-        <select id="cfg-aba" style="width:200px" onchange="renderPreviewTabela(currentPreviewData, this.value)">
-          ${data.abas.map(a => `<option>${a}</option>`).join('')}
-        </select>
-      </div>
-    </div>
-    <p class="text-muted" style="margin-bottom:10px">Clique no cabeçalho para selecionar:
-      <span style="color:var(--accent)">● Código Fornecedor</span> e
-      <span style="color:var(--yellow)">● Preço</span>
-    </p>
-    <div id="preview-table-wrap"></div>
-    <div class="flex mt-16">
-      <button class="btn btn-primary" id="btn-confirmar-arquivo" onclick="confirmarArquivo(${idx})" disabled>
-        ${idx < filesToConfig.length - 1 ? 'Confirmar e próximo →' : '✅ Importar tudo'}
-      </button>
-    </div>`;
-  window.currentPreviewData = data;
-  renderPreviewTabela(data, data.abas[0]);
-}
-
-let selectedCF = null, selectedPF = null;
-
-function renderPreviewTabela(data, aba) {
-  selectedCF = null; selectedPF = null;
-  document.getElementById('btn-confirmar-arquivo').disabled = true;
-  const preview = data.preview[aba];
-  const cols = preview.colunas;
-  const rows = preview.linhas;
-  window.currentCols = cols;
-  let thead = '<tr>' + cols.map((c,i) => `<th onclick="selectCol(${i},'${c.replace(/'/g,"\\'")}')" id="th-col-${i}">${c}</th>`).join('') + '</tr>';
-  let tbody = rows.map(r => '<tr>' + cols.map((_,i) => `<td>${r[i] || ''}</td>`).join('') + '</tr>').join('');
-  document.getElementById('preview-table-wrap').innerHTML = `
-    <div class="table-wrap"><table class="preview-table"><thead>${thead}</thead><tbody>${tbody}</tbody></table></div>
-    <div class="flex mt-16" style="gap:16px">
-      <div class="text-muted">Código: <strong id="lbl-cf" style="color:var(--accent)">não selecionado</strong></div>
-      <div class="text-muted">Preço: <strong id="lbl-pf" style="color:var(--yellow)">não selecionado</strong></div>
-    </div>`;
-}
-
-function selectCol(idx, name) {
-  const cols = window.currentCols;
-  if (!selectedCF || (selectedCF !== null && selectedPF !== null)) {
-    if (selectedCF !== null) {
-      const oldCFIdx = cols.indexOf(selectedCF);
-      const oldPFIdx = cols.indexOf(selectedPF);
-      if (oldCFIdx >= 0) document.getElementById('th-col-' + oldCFIdx)?.classList.remove('selected-cf');
-      if (oldPFIdx >= 0) document.getElementById('th-col-' + oldPFIdx)?.classList.remove('selected-pf');
-    }
-    selectedCF = name; selectedPF = null;
-    document.getElementById('th-col-' + idx).classList.add('selected-cf');
-    document.getElementById('lbl-cf').textContent = name;
-    document.getElementById('lbl-pf').textContent = 'não selecionado';
-    document.getElementById('btn-confirmar-arquivo').disabled = true;
-  } else if (!selectedPF && name !== selectedCF) {
-    selectedPF = name;
-    document.getElementById('th-col-' + idx).classList.add('selected-pf');
-    document.getElementById('lbl-pf').textContent = name;
-    document.getElementById('btn-confirmar-arquivo').disabled = false;
-  }
-}
-
-async function confirmarArquivo(idx) {
-  const forn = document.getElementById('cfg-fornecedor').value;
-  const aba = document.getElementById('cfg-aba').value;
-  configuredFiles.push({ file: filesToConfig[idx], fornecedor: forn, aba, coluna_codigo: selectedCF, coluna_preco: selectedPF });
-  document.getElementById(`fstatus-${idx}`)?.classList.replace('badge-yellow','badge-green');
-  if (idx < filesToConfig.length - 1) { await carregarConfigArquivo(idx + 1); }
-  else { await executarImportacao(); }
-}
-
-async function executarImportacao() {
-  document.getElementById('import-step-config').style.display = 'none';
-  document.getElementById('import-step-resultado').style.display = 'block';
-  const res = document.getElementById('resultado-import');
-  res.innerHTML = '<div class="spinner"></div> Importando...';
-  let html = '<div style="display:flex;flex-direction:column;gap:10px">';
-  for (const cfg of configuredFiles) {
-    const fd = new FormData();
-    fd.append('file', cfg.file); fd.append('fornecedor', cfg.fornecedor);
-    fd.append('aba', cfg.aba); fd.append('coluna_codigo', cfg.coluna_codigo);
-    fd.append('coluna_preco', cfg.coluna_preco);
-    const r = await fetch('/api/precos/importar', { method:'POST', body: fd });
-    const data = await r.json();
-    html += `<div class="file-item"><span>✅</span><span class="file-name"><strong>${cfg.fornecedor}</strong> — ${cfg.file.name}</span><span class="badge badge-green">${data.atualizados} preços atualizados</span></div>`;
-  }
-  html += '</div>';
-  res.innerHTML = html;
-  carregarResumoPrecos();
-}
-
-function resetImport() {
-  filesToConfig = []; configuredFiles = []; currentFileIdx = 0;
-  document.getElementById('import-step-upload').style.display = 'block';
-  document.getElementById('import-step-config').style.display = 'none';
-  document.getElementById('import-step-resultado').style.display = 'none';
-  document.getElementById('files-list').innerHTML = '';
-  document.getElementById('btn-iniciar-config').style.display = 'none';
-}
-
-async function carregarResumoPrecos() {
-  const r = await fetch('/api/precos/resumo');
-  const data = await r.json();
-  const el = document.getElementById('resumo-precos');
-  if (!data.length) { el.innerHTML = '<p class="text-muted">Nenhum preço importado ainda.</p>'; return; }
-  el.innerHTML = `<div class="table-wrap"><table>
-    <thead><tr><th>Fornecedor</th><th>Qtd. Preços</th><th>Última Atualização</th></tr></thead>
-    <tbody>${data.map(d => `<tr><td><strong>${d.fornecedor}</strong></td><td><span class="badge badge-green">${d.total}</span></td><td class="text-muted">${d.ultima_atualizacao ? new Date(d.ultima_atualizacao).toLocaleString('pt-BR') : '—'}</td></tr>`).join('')}</tbody>
-  </table></div>`;
-}
-
-let vinculosData = [];
-
-async function carregarVinculos() {
-  const busca = document.getElementById('busca-vinculo')?.value || '';
-  const forn = document.getElementById('filtro-fornecedor')?.value || '';
-  const r = await fetch(`/api/vinculos?busca=${encodeURIComponent(busca)}&fornecedor=${encodeURIComponent(forn)}`);
-  vinculosData = await r.json();
-  renderVinculos();
-  const sel = document.getElementById('filtro-fornecedor');
-  if (sel.options.length <= 1) {
-    const rf = await fetch('/api/fornecedores');
-    const forns = await rf.json();
-    forns.forEach(f => { const o = document.createElement('option'); o.value = f; o.textContent = f; sel.appendChild(o); });
-    const selAdd = document.getElementById('vinc-fornecedor');
-    forns.forEach(f => { const o = document.createElement('option'); o.value = f; o.textContent = f; selAdd.appendChild(o); });
-  }
-}
-
-function renderVinculos() {
-  const tbody = document.getElementById('tbody-vinculos');
-  tbody.innerHTML = vinculosData.map(v => `<tr>
-    <td><span class="badge badge-green">${v.meu_codigo}</span></td>
-    <td style="max-width:250px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${v.descricao || '—'}</td>
-    <td>${v.fornecedor}</td>
-    <td style="font-family:var(--mono);font-size:12px">${v.codigo_fornecedor}</td>
-    <td><button class="btn btn-danger btn-sm" onclick="deletarVinculo(${v.id})">✕</button></td>
-  </tr>`).join('');
-  document.getElementById('vinculos-count').textContent = `${vinculosData.length} vínculos encontrados`;
-}
-
-function filtrarVinculos() { carregarVinculos(); }
-
-async function deletarVinculo(id) {
-  if (!confirm('Remover este vínculo?')) return;
-  await fetch(`/api/vinculos/${id}`, { method:'DELETE' });
-  toast('Vínculo removido');
-  carregarVinculos();
-}
-
-async function adicionarVinculo() {
-  const codigo = document.getElementById('vinc-codigo').value.trim();
-  const descricao = document.getElementById('vinc-descricao').value.trim();
-  const fornecedor = document.getElementById('vinc-fornecedor').value;
-  const cod_forn = document.getElementById('vinc-cod-forn').value.trim();
-  if (!codigo || !fornecedor || !cod_forn) { toast('Preencha todos os campos'); return; }
-  await fetch('/api/vinculos', { method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({ meu_codigo: codigo, descricao, fornecedor, codigo_fornecedor: cod_forn }) });
-  toast('✅ Vínculo adicionado!');
-  document.getElementById('vinc-codigo').value = '';
-  document.getElementById('vinc-descricao').value = '';
-  document.getElementById('vinc-cod-forn').value = '';
-  carregarVinculos();
-}
-
-let acTimer;
-async function autocompleteProduct(input) {
-  clearTimeout(acTimer);
-  acTimer = setTimeout(async () => {
-    if (input.value.length < 2) { document.getElementById('autocomplete-list').style.display = 'none'; return; }
-    const r = await fetch(`/api/produtos/busca?q=${encodeURIComponent(input.value)}`);
-    const data = await r.json();
-    const list = document.getElementById('autocomplete-list');
-    if (!data.length) { list.style.display = 'none'; return; }
-    list.innerHTML = data.map(p => `<div onclick="selecionarProduto('${p.codigo}','${p.descricao.replace(/'/g,"\\'")}')"
-      style="padding:8px 12px;cursor:pointer;font-size:12px;border-bottom:1px solid var(--border)"
-      onmouseover="this.style.background='var(--bg2)'" onmouseout="this.style.background=''">
-      <strong>${p.codigo}</strong> — ${p.descricao}</div>`).join('');
-    list.style.display = 'block';
-  }, 250);
-}
-
-function selecionarProduto(codigo, descricao) {
-  document.getElementById('vinc-codigo').value = codigo;
-  document.getElementById('vinc-descricao').value = descricao;
-  document.getElementById('autocomplete-list').style.display = 'none';
-}
-
-document.addEventListener('click', e => {
-  if (!e.target.closest('#vinc-codigo') && !e.target.closest('#autocomplete-list'))
-    document.getElementById('autocomplete-list').style.display = 'none';
+window.addEventListener('DOMContentLoaded',()=>{
+  carregarPrecosCache();
+  const saved=localStorage.getItem('pedidoData');
+  const savedEmp=parseInt(localStorage.getItem('pedidoEmpresa')||'1');
+  if(saved){try{pedidoData=JSON.parse(saved);pedidoEmpresa=savedEmp;if(pedidoData.length){document.getElementById('filtro-pedido-row').style.display=savedEmp===1?'block':'none';document.getElementById('filtro-pedido-row-outras').style.display=savedEmp===1?'none':'block';renderPedido();}}catch(e){}}
 });
 
-async function importarCSV(input) {
-  const fd = new FormData(); fd.append('file', input.files[0]);
-  const res = document.getElementById('resultado-csv');
-  res.innerHTML = '<div class="spinner"></div> Importando...';
-  const r = await fetch('/api/vinculos/importar-csv', { method:'POST', body: fd });
-  const data = await r.json();
-  res.innerHTML = `<div class="card" style="margin-top:0">
-    <div style="display:flex;gap:20px">
-      <div class="stat"><div class="label">Produtos inseridos</div><div class="value">${data.produtos_inseridos}</div></div>
-      <div class="stat"><div class="label">Vínculos inseridos</div><div class="value">${data.vinculos_inseridos}</div></div>
-      <div class="stat"><div class="label">Ignorados</div><div class="value" style="color:var(--text2)">${data.ignorados}</div></div>
+async function carregarPrecosCache(){
+  try{const r=await fetch('/api/precos/todos');const data=await r.json();precosCache={};data.forEach(p=>{precosCache[`${p.fornecedor}__${p.codigo_fornecedor}`]=parseFloat(p.preco);});}catch(e){}
+}
+
+// Valores padrão sugeridos por empresa (o usuário pode ajustar na tela antes de buscar)
+const EMPRESA_DEFAULTS={
+  1:{codlocal:10000000, dias_uteis_mes:22, cobertura_dias:30, tipos_venda:'1100'},
+  3:{codlocal:20000000, dias_uteis_mes:26, cobertura_dias:15, tipos_venda:'1120'},
+  4:{codlocal:30000000, dias_uteis_mes:26, cobertura_dias:15, tipos_venda:'1120'},
+};
+
+function onEmpresaChange(){
+  const emp=parseInt(document.getElementById('cfg-codemp').value);
+  const d=EMPRESA_DEFAULTS[emp]||EMPRESA_DEFAULTS[1];
+  document.getElementById('cfg-codlocal').value=d.codlocal;
+  document.getElementById('cfg-dias-uteis-mes').value=d.dias_uteis_mes;
+  document.getElementById('cfg-cobertura-dias').value=d.cobertura_dias;
+  document.getElementById('cfg-tipos-venda').value=d.tipos_venda;
+  // Limpa busca ao trocar empresa
+  limparPedido();
+}
+
+function navTo(page,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('nav a').forEach(a=>a.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  el.classList.add('active');
+  const titles={pedido:'Pedido de Compras',importar:'Importar Preços',vinculos:'Vínculos',registros:'Registro de Pedidos',carga:'Carga Inicial'};
+  document.getElementById('page-title').textContent=titles[page];
+  if(page==='vinculos')carregarVinculos();
+  if(page==='importar')carregarResumoPrecos();
+  if(page==='registros')carregarRegistros();
+}
+
+function toggleConfigCard(){
+  const body=document.getElementById('config-card-body');
+  const btn=document.getElementById('btn-toggle-config');
+  const recolhido=body.style.display==='none';
+  body.style.display=recolhido?'block':'none';
+  btn.textContent=recolhido?'▲ Recolher':'▼ Expandir';
+  setTimeout(ajustarAlturaTabela,50);
+}
+
+function toast(msg,dur=3000){const t=document.getElementById('toast');t.textContent=msg;t.style.display='block';setTimeout(()=>t.style.display='none',dur);}
+
+// ── PEDIDO ────────────────────────────────────────────────────
+async function carregarSankhya(){
+  const codemp=parseInt(document.getElementById('cfg-codemp').value);
+  pedidoEmpresa=codemp;
+
+  const body={
+    codemp,
+    codlocal:         parseInt(document.getElementById('cfg-codlocal').value),
+    dias_uteis_mes:    parseInt(document.getElementById('cfg-dias-uteis-mes').value),
+    cobertura_dias:    parseInt(document.getElementById('cfg-cobertura-dias').value),
+    margem_seguranca:  parseFloat(document.getElementById('cfg-margem').value),
+    qtd_sem_historico: parseInt(document.getElementById('cfg-qtd-sem-historico').value),
+    tipos_venda:       document.getElementById('cfg-tipos-venda').value,
+    tipos_compra:      document.getElementById('cfg-tipos-compra').value,
+    incluir_apoio:     document.getElementById('txt-incluir-apoio').value,
+    excluir_apoio:     document.getElementById('txt-excluir-apoio').value,
+    incluir_marca:     document.getElementById('txt-incluir-marca').value,
+    excluir_marca:     document.getElementById('txt-excluir-marca').value,
+  };
+
+  toast('🔄 Buscando do Sankhya...');
+  try{
+    const r=await fetch('/api/pedido/sankhya',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    if(!r.ok)throw new Error(await r.text());
+    pedidoData=await r.json();
+
+    if(codemp===1){await carregarPrecosCache();atualizarPrecosPedido();}
+    localStorage.setItem('pedidoData',JSON.stringify(pedidoData));
+    localStorage.setItem('pedidoEmpresa',String(codemp));
+    // Popula filtro fornecedor
+    const selForn=document.getElementById('filtro-pedido-fornecedor');
+    if(selForn){selForn.innerHTML='<option value="">Todos fornecedores</option>';FORNECEDORES.forEach(f=>{if(pedidoData.some(p=>p.fornecedor_sugerido===f||p.fornecedor_selecionado===f)){const o=document.createElement('option');o.value=f;o.textContent=f;selForn.appendChild(o);}});}
+    document.getElementById('filtro-pedido-row').style.display=codemp===1?'block':'none';
+    document.getElementById('filtro-pedido-row-outras').style.display=codemp===1?'none':'block';
+    renderPedido();
+    toast(`✅ ${pedidoData.length} itens carregados`);
+  }catch(e){toast('❌ Erro: '+e.message,5000);}
+}
+
+function limparPedido(){
+  pedidoData=[];localStorage.removeItem('pedidoData');localStorage.removeItem('pedidoEmpresa');
+  document.getElementById('pedido-container-emp1').style.display='none';
+  document.getElementById('pedido-container-outras').style.display='none';
+  ['stat-itens','stat-com-preco','stat-sem-vinculo','stat-total'].forEach(id=>document.getElementById(id).textContent='—');
+}
+
+function atualizarPrecosPedido(){
+  pedidoData.forEach(item=>{
+    FORNECEDORES.forEach(forn=>{
+      const info=item.precos?.[forn];
+      if(info&&info.codigo_fornecedor){const key=`${forn}__${info.codigo_fornecedor}`;if(precosCache[key])item.precos[forn].preco=precosCache[key];}
+    });
+    const disp=Object.entries(item.precos||{}).filter(([,v])=>v.preco).reduce((a,[k,v])=>({...a,[k]:v}),{});
+    if(Object.keys(disp).length){
+      const melhor=Object.keys(disp).reduce((a,b)=>disp[a].preco<disp[b].preco?a:b);
+      item.fornecedor_sugerido=melhor;item.preco_sugerido=disp[melhor].preco;item.cod_forn_sugerido=disp[melhor].codigo_fornecedor;
+      item.tem_vinculo=true; // tem preço = tem vínculo
+    } else {
+      item.fornecedor_sugerido=null;item.preco_sugerido=null;item.cod_forn_sugerido=null;
+      item.tem_vinculo=false; // sem preço = sem vínculo
+    }
+  });
+}
+
+function sortPedido(col){
+  if(pedidoSortCol===col)pedidoSortDir*=-1;else{pedidoSortCol=col;pedidoSortDir=1;}
+  pedidoData.sort((a,b)=>{const va=a[col]||0,vb=b[col]||0;return typeof va==='number'?(va-vb)*pedidoSortDir:String(va).localeCompare(String(vb))*pedidoSortDir;});
+  renderPedido();
+}
+
+function renderPedido(){
+  document.getElementById('pedido-container-emp1').style.display='none';
+  document.getElementById('pedido-container-outras').style.display='none';
+
+  if(pedidoEmpresa===1){
+    renderPedidoEmp1();
+  } else {
+    document.getElementById('badge-empresa-outras').textContent='Empresa '+pedidoEmpresa+' — Filial';
+    renderPedidoOutras();
+  }
+  setTimeout(ajustarAlturaTabela,50);
+}
+
+function renderPedidoEmp1(){
+  const tbody=document.getElementById('tbody-pedido-emp1');
+  tbody.innerHTML='';
+  let comPreco=0,total=0;
+  const semVinculo = pedidoData.filter(p=>!p.tem_vinculo).length; // sempre do total
+  const listaExibir = pedidoFiltrado || pedidoData; // filtrado ou todos
+  listaExibir.forEach((item,idx)=>{
+    // idx aqui é o índice na lista exibida — para remoção precisa do índice real
+    const idxReal = pedidoData.indexOf(item);
+    const fornSel=item.fornecedor_selecionado||item.fornecedor_sugerido||'';
+    if(fornSel)comPreco++;
+    const tr=document.createElement('tr');
+    if(!item.tem_vinculo)tr.classList.add('row-no-link');
+    let precosCells=FORNECEDORES.map(f=>{
+      const info=item.precos?.[f];
+      if(!info||!info.preco)return`<td class="price-none">—</td>`;
+      const isBest=f===fornSel;
+      return`<td><span class="${isBest?'price-best':''} price-editable" onclick="editarPreco(${idx},'${f}','${info.codigo_fornecedor}',this)">R$ ${Number(info.preco).toFixed(2)}</span></td>`;
+    }).join('');
+    const opts=FORNECEDORES.filter(f=>item.precos?.[f]?.preco).map(f=>`<option value="${f}" ${f===fornSel?'selected':''}>${f}</option>`).join('');
+    const select=opts?`<select data-idx="${idx}" onchange="onFornChange(this)" style="width:90px;padding:3px 6px;font-size:12px">${opts}</select>`:`<span class="badge badge-red">Sem vínculo</span>`;
+    const precoSel=item.preco_selecionado||item.preco_sugerido||0;
+    const qtd=Number(item.sugestao_compra_ajustada)||0;
+    if(precoSel)total+=precoSel*qtd;
+    tr.innerHTML=`
+      <td><span class="badge badge-blue">${item.codprod}</span></td>
+      <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${item.descrprod||''}">${item.descrprod||''}</td>
+      <td>${item.marca||'—'}</td>
+      <td style="font-size:11px">${item.referencia||'—'}</td>
+      <td>R$ ${Number(item.custo_gerencial||0).toFixed(2)}</td>
+      <td>${Number(item.estoque_disponivel||0).toFixed(0)}</td>
+      <td>${Number(item.giro_diario||0).toFixed(2)}</td>
+      <td>${Number(item.sugestao_compra_giro||0).toFixed(0)}</td>
+      <td><strong style="color:var(--accent)">${qtd}</strong></td>
+      ${precosCells}
+      <td>${select}</td>
+      <td class="preco-cell" data-idx="${idx}">${precoSel?'R$ '+precoSel.toFixed(2):'—'}</td>
+      <td class="sub-cell" data-idx="${idx}">${precoSel?'R$ '+(precoSel*qtd).toFixed(2):'—'}</td>
+      <td class="codforn-cell" data-idx="${idx}" style="font-size:11px;font-family:monospace">${item.cod_forn_selecionado||item.cod_forn_sugerido||'—'}</td>
+      <td><button class="btn btn-danger btn-sm" onclick="removerItemPedido(${idxReal})" title="Remover item">✕</button></td>`;
+    tbody.appendChild(tr);
+  });
+  document.getElementById('pedido-container-emp1').style.display='block';
+  document.getElementById('stat-itens').textContent=pedidoData.length;
+  document.getElementById('stat-com-preco').textContent=comPreco;
+  document.getElementById('stat-sem-vinculo').textContent=semVinculo;
+  document.getElementById('stat-total').textContent='R$ '+total.toLocaleString('pt-BR',{minimumFractionDigits:2});
+}
+
+function renderPedidoOutras(){
+  const tbody=document.getElementById('tbody-pedido-outras');
+  tbody.innerHTML='';
+  const listaExibir3 = pedidoFiltrado || pedidoData;
+  listaExibir3.forEach((item,idx)=>{
+    const idxReal = pedidoData.indexOf(item);
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td><span class="badge badge-blue">${item.codprod}</span></td>
+      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${item.descrprod||''}">${item.descrprod||''}</td>
+      <td><span class="badge badge-orange">${item.marca||'—'}</span></td>
+      <td>R$ ${Number(item.custo_gerencial||0).toFixed(2)}</td>
+      <td>${Number(item.estoque_disponivel||0).toFixed(0)}</td>
+      <td><strong>${Number(item.estoque_disponivel_empresa1||0).toFixed(0)}</strong></td>
+      <td>${Number(item.giro_diario||0).toFixed(2)}</td>
+      <td>${Number(item.sugestao_compra_giro||0).toFixed(0)}</td>
+      <td><strong style="color:var(--accent)">${Number(item.sugestao_compra_ajustada||0).toFixed(0)}</strong></td>
+      <td>${item.qtd_ultima_compra||'—'}</td>
+      <td><button class="btn btn-danger btn-sm" onclick="removerItemPedidoOutras(${idxReal})" title="Remover item">✕</button></td>`;
+    tbody.appendChild(tr);
+  });
+  document.getElementById('pedido-container-outras').style.display='block';
+  document.getElementById('stat-itens').textContent=pedidoData.length;
+  document.getElementById('stat-com-preco').textContent='—';
+  document.getElementById('stat-sem-vinculo').textContent='—';
+  document.getElementById('stat-total').textContent='—';
+}
+
+function editarPreco(idx,forn,codForn,el){
+  const atual=parseFloat(el.textContent.replace('R$ ','').replace(',','.'))||0;
+  const input=document.createElement('input');
+  input.type='number';input.step='0.01';input.value=atual;input.className='price-input-edit';
+  el.replaceWith(input);input.focus();input.select();
+  async function salvar(){
+    const novoPreco=parseFloat(input.value);
+    if(isNaN(novoPreco)||novoPreco<=0){input.replaceWith(el);return;}
+    await fetch('/api/precos/manual',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({fornecedor:forn,codigo_fornecedor:codForn,preco:novoPreco})});
+    precosCache[`${forn}__${codForn}`]=novoPreco;pedidoData[idx].precos[forn].preco=novoPreco;
+    const disp=Object.entries(pedidoData[idx].precos).filter(([,v])=>v.preco).reduce((a,[k,v])=>({...a,[k]:v}),{});
+    if(Object.keys(disp).length){const melhor=Object.keys(disp).reduce((a,b)=>disp[a].preco<disp[b].preco?a:b);pedidoData[idx].fornecedor_sugerido=melhor;pedidoData[idx].preco_sugerido=disp[melhor].preco;}
+    localStorage.setItem('pedidoData',JSON.stringify(pedidoData));renderPedido();toast('✅ Preço atualizado!');
+  }
+  input.addEventListener('blur',salvar);
+  input.addEventListener('keydown',e=>{if(e.key==='Enter')salvar();if(e.key==='Escape')input.replaceWith(el);});
+}
+
+function onFornChange(sel){
+  const idx=parseInt(sel.dataset.idx);const item=pedidoData[idx];const forn=sel.value;
+  const info=item.precos?.[forn];const preco=info?.preco||0;const qtd=Number(item.sugestao_compra_ajustada)||0;
+  item.fornecedor_selecionado=forn;item.preco_selecionado=preco;item.cod_forn_selecionado=info?.codigo_fornecedor;item.subtotal=preco*qtd;
+  document.querySelector(`.preco-cell[data-idx="${idx}"]`).textContent=preco?`R$ ${preco.toFixed(2)}`:'—';
+  document.querySelector(`.sub-cell[data-idx="${idx}"]`).textContent=preco?`R$ ${(preco*qtd).toFixed(2)}`:'—';
+  document.querySelector(`.codforn-cell[data-idx="${idx}"]`).textContent=info?.codigo_fornecedor||'—';
+  let total=0;pedidoData.forEach(p=>{const pr=p.preco_selecionado||p.preco_sugerido||0;total+=pr*(Number(p.sugestao_compra_ajustada)||0);});
+  document.getElementById('stat-total').textContent='R$ '+total.toLocaleString('pt-BR',{minimumFractionDigits:2});
+  localStorage.setItem('pedidoData',JSON.stringify(pedidoData));
+}
+
+async function exportarPedido(){
+  const itens=pedidoData.map(p=>({...p,codigo:p.codprod,descricao:p.descrprod,fornecedor_selecionado:p.fornecedor_selecionado||p.fornecedor_sugerido||'',cod_forn_selecionado:p.cod_forn_selecionado||p.cod_forn_sugerido||'',preco_selecionado:p.preco_selecionado||p.preco_sugerido||0,subtotal:(p.preco_selecionado||p.preco_sugerido||0)*(Number(p.sugestao_compra_ajustada)||0)}));
+  const r=await fetch('/api/pedido/exportar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({itens,codemp:1})});
+  const blob=await r.blob();const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='pedido_emp1.xlsx';a.click();
+}
+
+async function exportarPedidoOutras(){
+  const r=await fetch('/api/pedido/exportar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({itens:pedidoData,codemp:pedidoEmpresa})});
+  const blob=await r.blob();const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='pedido_outras.xlsx';a.click();
+}
+
+// ── EMITIR PEDIDO (Empresa 1) ─────────────────────────────────
+function abrirModalEmitirPedido(){
+  if(!pedidoData.length){toast('⚠️ Nenhum item no pedido');return;}
+  const sel=document.getElementById('emitir-fornecedor');
+  sel.innerHTML='<option value="">Escolha um fornecedor...</option>';
+  const fornsComItens=new Set();
+  pedidoData.forEach(item=>{const forn=item.fornecedor_selecionado||item.fornecedor_sugerido;if(forn)fornsComItens.add(forn);});
+  fornsComItens.forEach(f=>{const o=document.createElement('option');o.value=f;o.textContent=f;sel.appendChild(o);});
+  document.getElementById('preview-pedido').innerHTML='';
+  document.getElementById('btns-emitir').style.display='none';
+  document.getElementById('modal-emitir').classList.add('open');
+}
+
+function previsualizarPedido(){
+  const forn=document.getElementById('emitir-fornecedor').value;
+  if(!forn){document.getElementById('preview-pedido').innerHTML='';document.getElementById('btns-emitir').style.display='none';return;}
+  const itens=pedidoData.filter(item=>(item.fornecedor_selecionado||item.fornecedor_sugerido)===forn&&(item.preco_selecionado||item.preco_sugerido));
+  if(!itens.length){document.getElementById('preview-pedido').innerHTML='<p class="text-muted">Nenhum item para este fornecedor.</p>';document.getElementById('btns-emitir').style.display='none';return;}
+  const total=itens.reduce((s,i)=>{const p=i.preco_selecionado||i.preco_sugerido||0;const q=Number(i.sugestao_compra_ajustada)||0;return s+p*q;},0);
+  let html=`<div class="table-wrap" style="max-height:300px;overflow-y:auto"><table><thead><tr><th>Cód. Forn.</th><th>Descrição</th><th>Preço</th><th>Qtd.</th><th>Subtotal</th></tr></thead><tbody>`;
+  itens.forEach(i=>{const p=i.preco_selecionado||i.preco_sugerido||0;const q=Number(i.sugestao_compra_ajustada)||0;html+=`<tr><td style="font-family:monospace;font-size:11px">${i.cod_forn_selecionado||i.cod_forn_sugerido||''}</td><td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${i.descrprod||''}</td><td>R$ ${p.toFixed(2)}</td><td>${q}</td><td>R$ ${(p*q).toFixed(2)}</td></tr>`;});
+  html+=`</tbody></table></div><div class="flex mt-10" style="justify-content:flex-end"><strong>${itens.length} itens — Total: R$ ${total.toLocaleString('pt-BR',{minimumFractionDigits:2})}</strong></div>`;
+  document.getElementById('preview-pedido').innerHTML=html;
+  document.getElementById('btns-emitir').style.display='flex';
+}
+
+async function confirmarEmissao(){
+  const forn=document.getElementById('emitir-fornecedor').value;
+  const itens=pedidoData.filter(item=>(item.fornecedor_selecionado||item.fornecedor_sugerido)===forn&&(item.preco_selecionado||item.preco_sugerido))
+    .map(i=>({meu_codigo:String(i.codprod),descricao:i.descrprod||'',codigo_fornecedor:i.cod_forn_selecionado||i.cod_forn_sugerido||'',preco:i.preco_selecionado||i.preco_sugerido||0,quantidade:Number(i.sugestao_compra_ajustada)||0}));
+  const r=await fetch('/api/pedidos/emitir',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({fornecedor:forn,itens})});
+  const d=await r.json();
+  if(d.erro){toast('Erro: '+d.erro);return;}
+  fecharModal('modal-emitir');
+  toast(`✅ Pedido #${d.numero} emitido — baixando Excel...`);
+  // Baixa o Excel do MESMO pedido recém registrado (garante que o número bate com o Registro de Pedidos)
+  await downloadPedido(d.id,'excel',d.numero);
+  carregarRegistros();
+}
+
+// ── REGISTRO DE PEDIDOS ───────────────────────────────────────
+async function carregarRegistros(){
+  const r=await fetch('/api/pedidos');const data=await r.json();
+  const tbody=document.getElementById('tbody-registros');
+  const empty=document.getElementById('registros-empty');
+  if(!data.length){tbody.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  tbody.innerHTML=data.map(p=>`<tr>
+    <td><span class="badge badge-blue">#${p.numero}</span></td>
+    <td><strong>${p.fornecedor}</strong></td>
+    <td class="text-muted">${p.criado_em?new Date(p.criado_em).toLocaleString('pt-BR'):''}</td>
+    <td><strong style="color:var(--accent)">R$ ${Number(p.valor_total).toLocaleString('pt-BR',{minimumFractionDigits:2})}</strong></td>
+    <td class="flex" style="gap:6px">
+      <button class="btn btn-secondary btn-sm" onclick="verDetalhe(${p.id},'${p.numero}','${p.fornecedor}')">🔍 Ver</button>
+      <button class="btn btn-danger btn-sm" onclick="deletarPedido(${p.id})">✕</button>
+    </td>
+  </tr>`).join('');
+}
+
+async function verDetalhe(id,numero,fornecedor){
+  document.getElementById('modal-detalhe-title').textContent=`Pedido #${numero} — ${fornecedor}`;
+  document.getElementById('btn-dl-excel').onclick=()=>downloadPedido(id,'excel',numero);
+  document.getElementById('btn-dl-pdf').onclick=()=>downloadPedido(id,'pdf',numero);
+  document.getElementById('btn-dl-xml').onclick=()=>downloadPedido(id,'xml',numero);
+  document.getElementById('modal-detalhe-pedido').classList.add('open');
+  const r=await fetch(`/api/pedidos/${id}/itens`);const data=await r.json();
+  document.getElementById('tbody-detalhe-pedido').innerHTML=data.itens.map(i=>`<tr>
+    <td style="font-family:monospace;font-size:11px">${i.codigo_fornecedor||''}</td>
+    <td>${i.descricao||''}</td><td>R$ ${Number(i.preco).toFixed(2)}</td>
+    <td>${i.quantidade}</td><td>R$ ${Number(i.subtotal).toFixed(2)}</td>
+  </tr>`).join('');
+}
+
+async function downloadPedido(id,tipo,numero){
+  const endpoint = tipo==='excel'?'exportar-excel':tipo==='pdf'?'exportar-pdf':'exportar-xml';
+  const ext = tipo==='excel'?'xlsx':tipo==='pdf'?'pdf':'xml';
+  const r=await fetch(`/api/pedidos/${id}/${endpoint}`,{method:'POST'});
+  const blob=await r.blob();
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`pedido_${numero||id}.${ext}`;a.click();
+}
+
+async function deletarPedido(id){
+  if(!confirm('Excluir este registro?'))return;
+  await fetch(`/api/pedidos/${id}`,{method:'DELETE'});toast('Pedido excluído');carregarRegistros();
+}
+
+// ── IMPORTAR PREÇOS ───────────────────────────────────────────
+function handleDrop(e){e.preventDefault();document.getElementById('drop-zone').classList.remove('drag');handleFiles(e.dataTransfer.files);}
+function handleFiles(files){
+  filesToConfig=Array.from(files);
+  document.getElementById('files-list').innerHTML=filesToConfig.map((f,i)=>`<div class="file-item"><span>📄</span><span class="file-name">${f.name}</span><span class="badge badge-yellow" id="fstatus-${i}">aguardando</span></div>`).join('');
+  document.getElementById('btn-iniciar-config').style.display=filesToConfig.length?'inline-flex':'none';
+}
+async function iniciarConfig(){configuredFiles=[];document.getElementById('import-step-upload').style.display='none';document.getElementById('import-step-config').style.display='block';await carregarConfigArquivo(0);}
+
+async function carregarConfigArquivo(idx){
+  const file=filesToConfig[idx];const fd=new FormData();fd.append('file',file);
+  const r=await fetch('/api/precos/preview',{method:'POST',body:fd});
+  const data=await r.json();window.currentPreviewData=data;window.currentFileIdx=idx;window.currentFileB64=data.file_b64;
+  document.getElementById('config-wizard').innerHTML=`
+    <p class="text-muted" style="margin-bottom:10px">Arquivo ${idx+1} de ${filesToConfig.length}: <strong>${file.name}</strong></p>
+    <div class="flex flex-wrap" style="margin-bottom:10px;gap:10px">
+      <div style="flex:0 0 150px"><label class="field-label">Fornecedor</label><select id="cfg-fornecedor">${FORNECEDORES.map(f=>`<option>${f}</option>`).join('')}</select></div>
+      <div style="flex:0 0 180px"><label class="field-label">Aba</label><select id="cfg-aba" onchange="renderPreviewTabela(currentPreviewData,this.value)">${data.abas.map(a=>`<option>${a}</option>`).join('')}</select></div>
     </div>
-  </div>`;
+    <p class="text-muted" style="margin-bottom:8px">Clique: <span style="color:var(--accent);font-weight:600">● Código</span> depois <span style="color:var(--yellow);font-weight:600">● Preço</span></p>
+    <div id="preview-table-wrap"></div>
+    <div class="flex mt-10" style="gap:12px;align-items:center">
+      <span class="text-muted">Código: <strong id="lbl-cf" style="color:var(--accent)">não selecionado</strong></span>
+      <span class="text-muted">Preço: <strong id="lbl-pf" style="color:var(--yellow)">não selecionado</strong></span>
+      <button class="btn btn-secondary btn-sm" onclick="voltarImport()" style="margin-left:auto">← Voltar</button>
+      <button class="btn btn-primary" id="btn-confirmar-arquivo" onclick="confirmarArquivo(${idx})" disabled>${idx<filesToConfig.length-1?'Próximo →':'✅ Importar tudo'}</button>
+    </div>`;
+  renderPreviewTabela(data,data.abas[0]);
+}
+
+function voltarImport(){document.getElementById('import-step-config').style.display='none';document.getElementById('import-step-upload').style.display='block';}
+
+function renderPreviewTabela(data,aba){
+  if(document.getElementById('btn-confirmar-arquivo'))document.getElementById('btn-confirmar-arquivo').disabled=true;
+  if(document.getElementById('lbl-cf'))document.getElementById('lbl-cf').textContent='não selecionado';
+  if(document.getElementById('lbl-pf'))document.getElementById('lbl-pf').textContent='não selecionado';
+  const p=data.preview[aba];window.currentCols=p.colunas;
+  let thead='<tr>'+p.colunas.map((c,i)=>`<th onclick="selectCol(${i},'${c}')" id="th-col-${i}">${c}</th>`).join('')+'</tr>';
+  let tbody=p.linhas.map(row=>'<tr>'+row.map((cell,i)=>`<td class="col-cell-${i}" style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${cell||''}</td>`).join('')+'</tr>').join('');
+  document.getElementById('preview-table-wrap').innerHTML=`<div class="table-wrap" style="max-height:280px;overflow-y:auto"><table class="preview-table"><thead>${thead}</thead><tbody>${tbody}</tbody></table></div>`;
+}
+
+function selectCol(colIdx,name){
+  const cfEl=document.getElementById('lbl-cf');const pfEl=document.getElementById('lbl-pf');
+  const cf=cfEl?cfEl.textContent.trim():'';const pf=pfEl?pfEl.textContent.trim():'';
+  const cols=window.currentCols;
+  if(cf==='não selecionado'||(cf!=='não selecionado'&&pf!=='não selecionado')){
+    for(let i=0;i<cols.length;i++){document.getElementById(`th-col-${i}`)?.classList.remove('selected-cf','selected-pf');document.querySelectorAll(`.col-cell-${i}`).forEach(td=>td.classList.remove('selected-cf','selected-pf'));}
+    document.getElementById(`th-col-${colIdx}`).classList.add('selected-cf');document.querySelectorAll(`.col-cell-${colIdx}`).forEach(td=>td.classList.add('selected-cf'));
+    cfEl.textContent=name;pfEl.textContent='não selecionado';document.getElementById('btn-confirmar-arquivo').disabled=true;
+  } else if(pf==='não selecionado'&&name!==cf){
+    document.getElementById(`th-col-${colIdx}`).classList.add('selected-pf');document.querySelectorAll(`.col-cell-${colIdx}`).forEach(td=>td.classList.add('selected-pf'));
+    pfEl.textContent=name;document.getElementById('btn-confirmar-arquivo').disabled=false;
+  }
+}
+
+async function confirmarArquivo(idx){
+  const cf=document.getElementById('lbl-cf')?.textContent.trim()||'';const pf=document.getElementById('lbl-pf')?.textContent.trim()||'';
+  if(!cf||cf==='não selecionado'||!pf||pf==='não selecionado'){toast('⚠️ Selecione as duas colunas!');return;}
+  configuredFiles.push({file_b64:window.currentFileB64,file_name:filesToConfig[idx].name,fornecedor:document.getElementById('cfg-fornecedor').value,aba:document.getElementById('cfg-aba').value,coluna_codigo:cf,coluna_preco:pf});
+  document.getElementById(`fstatus-${idx}`)?.classList.replace('badge-yellow','badge-green');
+  if(idx<filesToConfig.length-1)await carregarConfigArquivo(idx+1);else await executarImportacao();
+}
+
+async function executarImportacao(){
+  document.getElementById('import-step-config').style.display='none';document.getElementById('import-step-resultado').style.display='block';
+  const res=document.getElementById('resultado-import');res.innerHTML='<div class="spinner"></div> Importando...';
+  let html='<div style="display:flex;flex-direction:column;gap:8px">';
+  for(const cfg of configuredFiles){
+    const r=await fetch('/api/precos/importar-json',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({fornecedor:cfg.fornecedor,aba:cfg.aba,coluna_codigo:cfg.coluna_codigo,coluna_preco:cfg.coluna_preco,file_b64:cfg.file_b64})});
+    const d=await r.json();
+    html+=`<div class="file-item"><span>✅</span><span class="file-name"><strong>${cfg.fornecedor}</strong> — ${cfg.file_name}</span><span class="badge badge-green">${d.atualizados||0} preços</span></div>`;
+  }
+  html+='</div>';res.innerHTML=html;carregarResumoPrecos();
+  await carregarPrecosCache();if(pedidoData.length&&pedidoEmpresa===1){atualizarPrecosPedido();renderPedido();toast('✅ Preços atualizados no pedido!');}
+}
+
+function resetImport(){filesToConfig=[];configuredFiles=[];document.getElementById('import-step-upload').style.display='block';document.getElementById('import-step-config').style.display='none';document.getElementById('import-step-resultado').style.display='none';document.getElementById('files-list').innerHTML='';document.getElementById('btn-iniciar-config').style.display='none';}
+
+async function carregarResumoPrecos(){
+  const r=await fetch('/api/precos/resumo');const data=await r.json();const el=document.getElementById('resumo-precos');
+  if(!data.length){el.innerHTML='<p class="text-muted">Nenhum preço importado ainda.</p>';return;}
+  el.innerHTML=`<div class="table-wrap"><table><thead><tr><th>Fornecedor</th><th>Qtd. Preços</th><th>Última Atualização</th><th></th></tr></thead><tbody>${data.map(d=>`<tr><td><strong>${d.fornecedor}</strong></td><td><span class="badge badge-green">${d.total}</span></td><td class="text-muted">${d.ultima_atualizacao?new Date(d.ultima_atualizacao).toLocaleString('pt-BR'):'—'}</td><td class="flex" style="gap:6px"><button class="btn btn-secondary btn-sm" onclick="abrirModalPrecos('${d.fornecedor}')">🔍 Ver</button><button class="btn btn-danger btn-sm" onclick="excluirPrecosFornecedor('${d.fornecedor}')">🗑️</button></td></tr>`).join('')}</tbody></table></div>`;
+}
+
+async function excluirPrecosFornecedor(forn){
+  if(!confirm(`Excluir todos os preços de ${forn}?`))return;
+  await fetch(`/api/precos/fornecedor-delete/${forn}`,{method:'DELETE'});
+  toast(`Preços de ${forn} excluídos`);
+  carregarResumoPrecos();
+  await carregarPrecosCache();
+  // Zera preços do fornecedor excluído em todos os itens do pedido
+  pedidoData.forEach(item=>{
+    if(item.precos&&item.precos[forn]){
+      item.precos[forn].preco=null;
+    }
+    // Recalcula melhor preço
+    const disp=Object.entries(item.precos||{}).filter(([,v])=>v.preco).reduce((a,[k,v])=>({...a,[k]:v}),{});
+    if(Object.keys(disp).length){
+      const melhor=Object.keys(disp).reduce((a,b)=>disp[a].preco<disp[b].preco?a:b);
+      item.fornecedor_sugerido=melhor;item.preco_sugerido=disp[melhor].preco;item.cod_forn_sugerido=disp[melhor].codigo_fornecedor;
+      item.fornecedor_selecionado=null;item.preco_selecionado=null;
+    } else {
+      item.fornecedor_sugerido=null;item.preco_sugerido=null;item.cod_forn_sugerido=null;
+      item.fornecedor_selecionado=null;item.preco_selecionado=null;
+    }
+    item.tem_vinculo=Object.values(item.precos||{}).some(v=>v.preco);
+  });
+  localStorage.setItem('pedidoData',JSON.stringify(pedidoData));
+  if(pedidoData.length&&pedidoEmpresa===1){renderPedido();}
+}
+async function limparTodosPrecos(){
+  if(!confirm('Limpar TODOS os preços?'))return;
+  await fetch('/api/precos/limpar-todos',{method:'DELETE'});
+  toast('Todos os preços excluídos');
+  carregarResumoPrecos();
+  await carregarPrecosCache();
+  // Zera todos os preços no pedido
+  pedidoData.forEach(item=>{
+    FORNECEDORES.forEach(f=>{if(item.precos&&item.precos[f])item.precos[f].preco=null;});
+    item.fornecedor_sugerido=null;item.preco_sugerido=null;item.cod_forn_sugerido=null;
+    item.fornecedor_selecionado=null;item.preco_selecionado=null;item.tem_vinculo=false;
+  });
+  localStorage.setItem('pedidoData',JSON.stringify(pedidoData));
+  if(pedidoData.length&&pedidoEmpresa===1){renderPedido();}
+}
+
+async function abrirModalPrecos(fornecedor){
+  if(!fornecedor)return;document.getElementById('modal-title').textContent=`Preços — ${fornecedor}`;document.getElementById('modal-busca').value='';
+  document.getElementById('tbody-modal-precos').innerHTML='<tr><td colspan="2"><div class="spinner"></div></td></tr>';
+  document.getElementById('modal-precos').classList.add('open');
+  const r=await fetch(`/api/precos/fornecedor/${fornecedor}`);modalPrecosData=await r.json();renderModalPrecos(modalPrecosData);
+}
+function renderModalPrecos(data){document.getElementById('tbody-modal-precos').innerHTML=data.map(p=>`<tr><td style="font-family:monospace">${p.codigo_fornecedor}</td><td>R$ ${Number(p.preco).toFixed(2)}</td></tr>`).join('');document.getElementById('modal-count').textContent=`${data.length} preços`;}
+function filtrarModalPrecos(busca){renderModalPrecos(busca?modalPrecosData.filter(p=>p.codigo_fornecedor.toLowerCase().includes(busca.toLowerCase())):modalPrecosData);}
+function fecharModal(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
+
+// ── VÍNCULOS ──────────────────────────────────────────────────
+async function carregarVinculos(){
+  const busca=document.getElementById('busca-vinculo')?.value||'';const forn=document.getElementById('filtro-fornecedor')?.value||'';
+  const r=await fetch(`/api/vinculos?busca=${encodeURIComponent(busca)}&fornecedor=${encodeURIComponent(forn)}`);
+  vinculosData=await r.json();renderVinculos();
+  const sel=document.getElementById('filtro-fornecedor');
+  if(sel.options.length<=1){
+    const rf=await fetch('/api/fornecedores');const forns=await rf.json();
+    forns.forEach(f=>{
+      [['filtro-fornecedor'],['vinc-fornecedor'],['modal-fornecedor-sel']].forEach(([id])=>{const s=document.getElementById(id);if(s){const o=document.createElement('option');o.value=f;o.textContent=f;s.appendChild(o);}});
+    });
+  }
+}
+function renderVinculos(){
+  document.getElementById('tbody-vinculos').innerHTML=vinculosData.map(v=>{const key=`${v.fornecedor}__${v.codigo_fornecedor}`;const preco=precosCache[key];return`<tr><td><span class="badge badge-blue">${v.meu_codigo}</span></td><td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${v.descricao||'—'}</td><td>${v.fornecedor}</td><td style="font-family:monospace;font-size:11px">${v.codigo_fornecedor}</td><td>${preco?`<strong style="color:var(--accent)">R$ ${Number(preco).toFixed(2)}</strong>`:'<span class="text-muted">—</span>'}</td><td><button class="btn btn-danger btn-sm" onclick="deletarVinculo(${v.id})">✕</button></td></tr>`;}).join('');
+  document.getElementById('vinculos-count').textContent=`${vinculosData.length} vínculos encontrados`;
+}
+function filtrarVinculos(){carregarVinculos();}
+async function deletarVinculo(id){if(!confirm('Remover este vínculo?'))return;await fetch(`/api/vinculos/${id}`,{method:'DELETE'});toast('Vínculo removido');carregarVinculos();}
+async function adicionarVinculo(){
+  const codigo=document.getElementById('vinc-codigo').value.trim();const descricao=document.getElementById('vinc-descricao').value.trim();const fornecedor=document.getElementById('vinc-fornecedor').value;const cod_forn=document.getElementById('vinc-cod-forn').value.trim();
+  if(!codigo||!fornecedor||!cod_forn){toast('Preencha todos os campos');return;}
+  await fetch('/api/vinculos',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({meu_codigo:codigo,descricao,fornecedor,codigo_fornecedor:cod_forn})});
+  toast('✅ Vínculo adicionado!');document.getElementById('vinc-codigo').value='';document.getElementById('vinc-descricao').value='';document.getElementById('vinc-cod-forn').value='';carregarVinculos();
+}
+async function exportarVinculos(){const busca=document.getElementById('busca-vinculo').value||'';const forn=document.getElementById('filtro-fornecedor').value||'';const r=await fetch(`/api/vinculos/exportar-excel?busca=${encodeURIComponent(busca)}&fornecedor=${encodeURIComponent(forn)}`);const blob=await r.blob();const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='vinculos.xlsx';a.click();}
+async function baixarModeloVinculos(){const r=await fetch('/api/vinculos/modelo-excel');const blob=await r.blob();const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='modelo_vinculos.xlsx';a.click();}
+async function importarVinculosExcel(input){
+  const fd=new FormData();fd.append('file',input.files[0]);
+  const res=document.getElementById('resultado-import-vinculos');res.innerHTML='<div class="spinner"></div> Importando...';
+  const r=await fetch('/api/vinculos/importar-excel',{method:'POST',body:fd});const data=await r.json();
+  if(data.erro){res.innerHTML=`<span style="color:var(--red)">${data.erro}</span>`;return;}
+  res.innerHTML=`<div class="flex" style="gap:12px;margin-top:8px"><span class="badge badge-green">✅ ${data.inseridos} inseridos</span><span class="badge badge-yellow">⚠️ ${data.ignorados} ignorados</span></div>`;
+  toast('✅ Vínculos importados!');carregarVinculos();input.value='';
+}
+let acTimer;
+async function autocompleteProduct(input){
+  clearTimeout(acTimer);acTimer=setTimeout(async()=>{
+    if(input.value.length<2){document.getElementById('autocomplete-list').style.display='none';return;}
+    const r=await fetch(`/api/produtos/busca?q=${encodeURIComponent(input.value)}`);const data=await r.json();const list=document.getElementById('autocomplete-list');
+    if(!data.length){list.style.display='none';return;}
+    list.innerHTML=data.map(p=>`<div onclick="selecionarProduto('${p.codigo}','${p.descricao.replace(/'/g,"\\'")}')" style="padding:8px 12px;cursor:pointer;font-size:12px;border-bottom:1px solid var(--border)" onmouseover="this.style.background='#f8f9fa'" onmouseout="this.style.background=''"><strong>${p.codigo}</strong> — ${p.descricao}</div>`).join('');
+    list.style.display='block';
+  },250);
+}
+function selecionarProduto(codigo,descricao){document.getElementById('vinc-codigo').value=codigo;document.getElementById('vinc-descricao').value=descricao;document.getElementById('autocomplete-list').style.display='none';}
+document.addEventListener('click',e=>{if(!e.target.closest('#vinc-codigo')&&!e.target.closest('#autocomplete-list'))document.getElementById('autocomplete-list').style.display='none';});
+async function importarCSV(input){
+  const fd=new FormData();fd.append('file',input.files[0]);const res=document.getElementById('resultado-csv');res.innerHTML='<div class="spinner"></div> Importando...';
+  const r=await fetch('/api/vinculos/importar-csv',{method:'POST',body:fd});const data=await r.json();
+  res.innerHTML=`<div class="card"><div class="card-body"><div class="flex" style="gap:12px"><div class="stat"><div class="label">Produtos</div><div class="value">${data.produtos_inseridos}</div></div><div class="stat"><div class="label">Vínculos</div><div class="value">${data.vinculos_inseridos}</div></div><div class="stat"><div class="label">Ignorados</div><div class="value" style="color:var(--text2)">${data.ignorados}</div></div></div></div></div>`;
   toast('✅ Carga concluída!');
 }
+
+
+function removerItemPedido(idx){
+  pedidoData.splice(idx,1);
+  localStorage.setItem('pedidoData',JSON.stringify(pedidoData));
+  renderPedidoEmp1();
+  toast('Item removido da lista');
+}
+
+function removerItemPedidoOutras(idx){
+  pedidoData.splice(idx,1);
+  localStorage.setItem('pedidoData',JSON.stringify(pedidoData));
+  renderPedidoOutras();
+  toast('Item removido da lista');
+}
+
+
+async function gerarXmlOutras(){
+  if(!pedidoData.length){toast('Nenhum item no pedido');return;}
+  const itens = pedidoData.map(p=>({
+    meu_codigo: String(p.codprod),
+    descricao: p.descrprod||'',
+    codigo_fornecedor: String(p.codprod),
+    preco: parseFloat(p.custo_gerencial||0),
+    quantidade: Number(p.sugestao_compra_ajustada)||0
+  })).filter(i=>i.quantidade>0);
+  if(!itens.length){toast('Nenhum item com quantidade');return;}
+  toast('🔄 Gerando XML...');
+  // Gera o XML direto dos itens carregados — uma chamada só, sem criar pedido no banco
+  const r = await fetch('/api/pedido/exportar-xml',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({itens})});
+  if(!r.ok){toast('❌ Erro ao gerar XML');return;}
+  const blob = await r.blob();
+  const a = document.createElement('a');a.href=URL.createObjectURL(blob);a.download='pedido.xml';a.click();
+  toast('✅ XML gerado');
+}
+
+// ── FILTRO TABELA PEDIDO ──────────────────────────────────────
+
+
+function filtrarTabelaPedido(){
+  const texto = document.getElementById('filtro-pedido-texto').value.toLowerCase();
+  const forn  = document.getElementById('filtro-pedido-fornecedor').value;
+  pedidoData = pedidoData.filter(item => {
+    const matchTexto = !texto || String(item.codprod).includes(texto) || (item.descrprod||'').toLowerCase().includes(texto) || (item.marca||'').toLowerCase().includes(texto);
+    const fornSel = item.fornecedor_selecionado || item.fornecedor_sugerido || '';
+    const matchForn = !forn || fornSel === forn;
+    return matchTexto && matchForn;
+  });
+  renderPedidoEmp1();
+}
+
+function limparFiltroPedido(){
+  document.getElementById('filtro-pedido-texto').value='';
+  document.getElementById('filtro-pedido-fornecedor').value='';
+  pedidoData = [...pedidoData];
+  renderPedidoEmp1();
+}
+
+function filtrarTabelaPedidoOutras(){
+  const texto = document.getElementById('filtro-pedido-texto-outras').value.toLowerCase();
+  pedidoData = pedidoData.filter(item => {
+    return !texto || String(item.codprod).includes(texto) || (item.descrprod||'').toLowerCase().includes(texto) || (item.marca||'').toLowerCase().includes(texto);
+  });
+  renderPedidoOutras();
+}
+
+function limparFiltroPedidoOutras(){
+  document.getElementById('filtro-pedido-texto-outras').value='';
+  pedidoData = [...pedidoData];
+  renderPedidoOutras();
+}
+
+// Exportar produtos sem vínculo (empresa 1)
+async function exportarSemVinculo(){
+  const semVinculo = pedidoData.filter(p => !p.tem_vinculo);
+  if(!semVinculo.length){toast('Nenhum produto sem vínculo!');return;}
+  const rows = semVinculo.map(p=>({
+    'Código': p.codprod,
+    'Descrição': p.descrprod||'',
+    'Marca': p.marca||'',
+    'Referência': p.referencia||''
+  }));
+  const r = await fetch('/api/pedido/exportar-sem-vinculo', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({itens: rows})
+  });
+  const blob = await r.blob();
+  const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='sem_vinculo.xlsx'; a.click();
+  toast(`✅ ${semVinculo.length} produtos sem vínculo exportados`);
+}
+
 </script>
 </body>
 </html>

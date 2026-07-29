@@ -5,12 +5,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL")
-engine = create_engine(DATABASE_URL) if DATABASE_URL else None
+engine = create_engine(DATABASE_URL)
 
 def init_db():
-    if not engine:
-        print("⚠️  DATABASE_URL não configurado — banco desativado")
-        return
     with engine.connect() as conn:
         conn.execute(text("""
             CREATE TABLE IF NOT EXISTS fornecedores (
@@ -47,6 +44,27 @@ def init_db():
                 preco NUMERIC NOT NULL,
                 atualizado_em TIMESTAMP DEFAULT NOW(),
                 UNIQUE (fornecedor, codigo_fornecedor)
+            );
+        """))
+        conn.execute(text("""
+            CREATE TABLE IF NOT EXISTS pedidos (
+                id SERIAL PRIMARY KEY,
+                numero TEXT NOT NULL,
+                fornecedor TEXT NOT NULL,
+                valor_total NUMERIC NOT NULL DEFAULT 0,
+                criado_em TIMESTAMP DEFAULT NOW()
+            );
+        """))
+        conn.execute(text("""
+            CREATE TABLE IF NOT EXISTS pedido_itens (
+                id SERIAL PRIMARY KEY,
+                pedido_id INTEGER NOT NULL REFERENCES pedidos(id) ON DELETE CASCADE,
+                meu_codigo TEXT NOT NULL,
+                descricao TEXT,
+                codigo_fornecedor TEXT,
+                preco NUMERIC NOT NULL DEFAULT 0,
+                quantidade INTEGER NOT NULL DEFAULT 0,
+                subtotal NUMERIC NOT NULL DEFAULT 0
             );
         """))
         conn.commit()
