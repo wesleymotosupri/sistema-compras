@@ -126,11 +126,11 @@ def buscar_lista_compras(
             CASE
                 WHEN TGFPRO.DESCRPROD LIKE 'OLEO MOTOR 1L%' OR TGFPRO.DESCRPROD LIKE 'OLEO MOTOR 1 LITRO%'
                 THEN 24
-                ELSE COALESCE(NULLIF(TGFPRO.AGRUPMIN, 0), 1)
+                ELSE COALESCE(NULLIF(TGFPRO.AD_QTDMULTVENDA, 0), 1)
             END
         """
     else:
-        multiplo_expr = "COALESCE(NULLIF(TGFPRO.AGRUPMIN, 0), 1)"
+        multiplo_expr = "COALESCE(NULLIF(TGFPRO.AD_QTDMULTVENDA, 0), 1)"
 
     sql = f"""
     WITH PARAMS AS (
