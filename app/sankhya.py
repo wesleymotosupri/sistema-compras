@@ -120,6 +120,18 @@ def buscar_lista_compras(
     # Regra: só filtra por estoque na Empresa 1 quando a empresa selecionada NÃO é a 1
     filtro_estoque_emp1 = "AND COALESCE(ESTOQUE_EMP1.ESTOQUE_DISPONIVEL_EMP1, 0) > 0" if codemp != 1 else ""
 
+    # Regra: óleo 1L só pode ser comprado em caixa fechada de 24 litros — vale só pra Empresa 3 e 4
+    if codemp in (3, 4):
+        multiplo_expr = """
+            CASE
+                WHEN TGFPRO.DESCRPROD LIKE 'OLEO MOTOR 1L%' OR TGFPRO.DESCRPROD LIKE 'OLEO MOTOR 1 LITRO%'
+                THEN 24
+                ELSE COALESCE(NULLIF(TGFPRO.MULTIPVENDA, 0), 1)
+            END
+        """
+    else:
+        multiplo_expr = "COALESCE(NULLIF(TGFPRO.MULTIPVENDA, 0), 1)"
+
     sql = f"""
     WITH PARAMS AS (
         SELECT
@@ -233,6 +245,7 @@ def buscar_lista_compras(
             TGFPRO.MARCA           AS MARCA,
             TGFPRO.REFERENCIA      AS REFERENCIA,
             TGFPRO.AD_APOIOCOMPRAS AS AD_APOIOCOMPRAS,
+            {multiplo_expr} AS MULTIPLO_VENDA,
             ESTOQUE.CODLOCAL       AS CODIGO_LOCAL,
             ESTOQUE.ESTOQUE        AS ESTOQUE,
             COALESCE(ESTOQUE.RESERVADO, 0) AS RESERVA,
@@ -302,7 +315,26 @@ def buscar_lista_compras(
             AND {filtros_marca_exc}
             {filtro_estoque_emp1}
     )
-    SELECT *
+    SELECT
+        CODPROD,
+        DESCRPROD,
+        MARCA,
+        REFERENCIA,
+        AD_APOIOCOMPRAS,
+        MULTIPLO_VENDA,
+        CODIGO_LOCAL,
+        ESTOQUE,
+        RESERVA,
+        ESTOQUE_DISPONIVEL,
+        CUSTO_GERENCIAL,
+        QTD_VENDIDA_3M,
+        GIRO_DIARIO,
+        QTD_ULTIMA_COMPRA,
+        DATA_ULTIMA_COMPRA,
+        SUGESTAO_COMPRA_GIRO,
+        -- Arredonda pra cima até o próximo múltiplo de venda (ex: pediu 12, múltiplo 10 -> compra 20)
+        CEILING(SUGESTAO_COMPRA_AJUSTADA * 1.0 / MULTIPLO_VENDA) * MULTIPLO_VENDA AS SUGESTAO_COMPRA_AJUSTADA,
+        ESTOQUE_DISPONIVEL_EMPRESA1
     FROM RESULTADO
     WHERE SUGESTAO_COMPRA_AJUSTADA > 0
     ORDER BY CODPROD
