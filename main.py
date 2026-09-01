@@ -4,7 +4,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
 from app.database import init_db
-from app.routes import pedido, precos, vinculos
+from app.routes import pedido, precos, vinculos, estoque_minimo
 from app.routes import registro_pedidos as pedidos_route
 
 app = FastAPI()
@@ -130,3 +130,4 @@ app.include_router(pedido.router, prefix="/api")
 app.include_router(precos.router, prefix="/api")
 app.include_router(vinculos.router, prefix="/api")
 app.include_router(pedidos_route.router, prefix="/api")
+app.include_router(estoque_minimo.router, prefix="/api")

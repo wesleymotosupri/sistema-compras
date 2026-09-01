@@ -5,10 +5,65 @@ from app.database import engine
 from app.sankhya import buscar_lista_compras, buscar_marcas
 import pandas as pd
 import io
+import math
 
 router = APIRouter()
 
 FORNECEDORES = ["Embus", "Tmac", "Solidez", "Atacado", "Catimoto", "Atec"]
+
+
+def _buscar_estoque_minimo() -> list[dict]:
+    with engine.connect() as conn:
+        rows = conn.execute(text("SELECT padrao, qtd_minima FROM estoque_minimo")).fetchall()
+    # Padrão mais longo primeiro, pra casar o mais específico antes do mais genérico
+    return sorted(
+        [{"padrao": r.padrao, "qtd_minima": r.qtd_minima} for r in rows],
+        key=lambda x: len(x["padrao"]),
+        reverse=True,
+    )
+
+
+def _aplicar_estoque_minimo_e_limite_matriz(produtos: list[dict], codemp: int) -> list[dict]:
+    """
+    Regras específicas de Empresa 3 e 4 (aplicadas depois do cálculo do Sankhya):
+
+    1. Estoque mínimo por padrão de descrição:
+       Base = MAIOR entre (sugestão já calculada, estoque mínimo cadastrado)
+       Final = Base arredondada pra cima até o próximo múltiplo de venda do produto
+
+    2. Limite da matriz:
+       A sugestão final nunca pode passar do estoque disponível na Empresa 1 (matriz)
+    """
+    if codemp not in (3, 4) or not produtos:
+        return produtos
+
+    padroes = _buscar_estoque_minimo()
+
+    for p in produtos:
+        descricao = (p.get("descrprod") or "").upper()
+        multiplo = int(p.get("multiplo_venda") or 1)
+        if multiplo <= 0:
+            multiplo = 1
+
+        # Procura o padrão de estoque mínimo mais específico que bate com a descrição
+        minimo = 0
+        for pad in padroes:
+            if pad["padrao"] in descricao:
+                minimo = pad["qtd_minima"]
+                break
+
+        sugestao_atual = int(p.get("sugestao_compra_ajustada") or 0)
+        base = max(sugestao_atual, minimo)
+        nova_sugestao = math.ceil(base / multiplo) * multiplo if base > 0 else 0
+
+        # Nunca pode sugerir mais do que existe disponível na matriz
+        estoque_matriz = int(p.get("estoque_disponivel_empresa1") or 0)
+        if nova_sugestao > estoque_matriz:
+            nova_sugestao = estoque_matriz
+
+        p["sugestao_compra_ajustada"] = nova_sugestao
+
+    return produtos
 
 def _cruzar_precos(produtos: list[dict]) -> list[dict]:
     if not produtos:
@@ -116,6 +171,7 @@ def pedido_do_sankhya(body: dict):
     if codemp == 1:
         return _cruzar_precos(produtos)
     else:
+        produtos = _aplicar_estoque_minimo_e_limite_matriz(produtos, codemp)
         return produtos
 
 

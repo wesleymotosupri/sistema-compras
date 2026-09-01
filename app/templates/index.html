@@ -123,6 +123,7 @@
     <a onclick="navTo('vinculos',this)"><span class="icon">🔗</span> Vínculos</a>
     <a onclick="navTo('registros',this)"><span class="icon">📁</span> Reg. Pedidos</a>
     <a onclick="navTo('carga',this)"><span class="icon">⚙️</span> Carga Inicial</a>
+    <a onclick="navTo('estoqueminimo',this)"><span class="icon">📏</span> Estoque Mínimo</a>
   </nav>
   <div class="sidebar-footer">
     <a href="/logout" class="logout-link"><span class="icon">🚪</span> Sair do sistema</a>
@@ -401,6 +402,36 @@
         </div>
       </div>
     </div>
+
+    <!-- ESTOQUE MÍNIMO -->
+    <div id="page-estoqueminimo" class="page">
+      <div class="card">
+        <div class="card-header"><h3>📏 Cadastrar Estoque Mínimo (Empresa 3 e 4)</h3></div>
+        <div class="card-body">
+          <p class="text-muted" style="margin-bottom:10px">
+            Uma linha por padrão, no formato <code style="color:var(--accent);background:var(--accent-light);padding:1px 6px;border-radius:3px">PADRÃO = QUANTIDADE</code>.
+            O padrão é comparado com qualquer parte da descrição do produto (não precisa ser a descrição inteira).
+          </p>
+          <textarea id="txt-estoque-minimo" rows="6" placeholder="ANTENA CORTA PIPA = 10&#10;BATERIA VRLA (GTI 6BS) = 5&#10;BATERIA VRLA (GTI 7BS) = 5&#10;FILTRO OLEO FAZER 250/LANDER 250/ = 5"></textarea>
+          <div class="flex mt-10">
+            <button class="btn btn-primary" onclick="importarEstoqueMinimo()">💾 Salvar</button>
+          </div>
+          <div id="resultado-estoque-minimo" class="mt-10"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>📋 Padrões Cadastrados</h3></div>
+        <div class="card-body">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Padrão</th><th>Estoque Mínimo</th><th>Atualizado em</th><th></th></tr></thead>
+              <tbody id="tbody-estoque-minimo"></tbody>
+            </table>
+          </div>
+          <div id="estoque-minimo-count" class="text-muted mt-10"></div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -528,11 +559,12 @@ function navTo(page,el){
   document.querySelectorAll('nav a').forEach(a=>a.classList.remove('active'));
   document.getElementById('page-'+page).classList.add('active');
   el.classList.add('active');
-  const titles={pedido:'Pedido de Compras',importar:'Importar Preços',vinculos:'Vínculos',registros:'Registro de Pedidos',carga:'Carga Inicial'};
+  const titles={pedido:'Pedido de Compras',importar:'Importar Preços',vinculos:'Vínculos',registros:'Registro de Pedidos',carga:'Carga Inicial',estoqueminimo:'Estoque Mínimo'};
   document.getElementById('page-title').textContent=titles[page];
   if(page==='vinculos')carregarVinculos();
   if(page==='importar')carregarResumoPrecos();
   if(page==='registros')carregarRegistros();
+  if(page==='estoqueminimo')carregarEstoqueMinimo();
 }
 
 function toggleConfigCard(){
@@ -1023,6 +1055,46 @@ async function importarCSV(input){
   const r=await fetch('/api/vinculos/importar-csv',{method:'POST',body:fd});const data=await r.json();
   res.innerHTML=`<div class="card"><div class="card-body"><div class="flex" style="gap:12px"><div class="stat"><div class="label">Produtos</div><div class="value">${data.produtos_inseridos}</div></div><div class="stat"><div class="label">Vínculos</div><div class="value">${data.vinculos_inseridos}</div></div><div class="stat"><div class="label">Ignorados</div><div class="value" style="color:var(--text2)">${data.ignorados}</div></div></div></div></div>`;
   toast('✅ Carga concluída!');
+}
+
+// ── ESTOQUE MÍNIMO ─────────────────────────────────────────────
+async function carregarEstoqueMinimo(){
+  const tbody=document.getElementById('tbody-estoque-minimo');
+  tbody.innerHTML='<tr><td colspan="4"><div class="spinner"></div></td></tr>';
+  const r=await fetch('/api/estoque-minimo');
+  const data=await r.json();
+  if(!data.length){
+    tbody.innerHTML='';
+    document.getElementById('estoque-minimo-count').textContent='Nenhum padrão cadastrado ainda.';
+    return;
+  }
+  tbody.innerHTML=data.map(d=>`<tr>
+    <td>${d.padrao}</td>
+    <td><strong style="color:var(--accent)">${d.qtd_minima}</strong></td>
+    <td class="text-muted">${d.atualizado_em?new Date(d.atualizado_em).toLocaleString('pt-BR'):''}</td>
+    <td><button class="btn btn-danger btn-sm" onclick="deletarEstoqueMinimo(${d.id})">✕</button></td>
+  </tr>`).join('');
+  document.getElementById('estoque-minimo-count').textContent=`${data.length} padrões cadastrados`;
+}
+
+async function importarEstoqueMinimo(){
+  const texto=document.getElementById('txt-estoque-minimo').value;
+  if(!texto.trim()){toast('⚠️ Cole ao menos uma linha antes de salvar');return;}
+  const res=document.getElementById('resultado-estoque-minimo');
+  res.innerHTML='<div class="spinner"></div> Salvando...';
+  const r=await fetch('/api/estoque-minimo/importar',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({texto})});
+  const data=await r.json();
+  res.innerHTML=`<div class="flex" style="gap:12px;margin-top:8px"><span class="badge badge-green">✅ ${data.inseridos} salvos</span><span class="badge badge-yellow">⚠️ ${data.ignorados} ignorados</span></div>`;
+  document.getElementById('txt-estoque-minimo').value='';
+  toast('✅ Estoque mínimo atualizado!');
+  carregarEstoqueMinimo();
+}
+
+async function deletarEstoqueMinimo(id){
+  if(!confirm('Remover esse padrão?'))return;
+  await fetch(`/api/estoque-minimo/${id}`,{method:'DELETE'});
+  toast('Padrão removido');
+  carregarEstoqueMinimo();
 }
 
 

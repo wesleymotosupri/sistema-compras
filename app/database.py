@@ -67,4 +67,12 @@ def init_db():
                 subtotal NUMERIC NOT NULL DEFAULT 0
             );
         """))
+        conn.execute(text("""
+            CREATE TABLE IF NOT EXISTS estoque_minimo (
+                id SERIAL PRIMARY KEY,
+                padrao TEXT NOT NULL UNIQUE,
+                qtd_minima INTEGER NOT NULL DEFAULT 0,
+                atualizado_em TIMESTAMP DEFAULT NOW()
+            );
+        """))
         conn.commit()
